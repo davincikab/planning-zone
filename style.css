@@ -1,0 +1,145 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+#map {
+    width: 100vw;
+    height: 100vh;
+}
+
+:root  {
+    --black:#000;
+    --light:#ddd;
+    --white:#fff;
+    --primary:teal;
+}
+
+body { 
+    margin: 0; 
+    padding: 0; 
+    font-family: "Avenir Next","Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+
+.toggler-header {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    font-size: 1.2rem;
+    padding: 0.25rem;
+    cursor: pointer;
+    border-bottom: 1px solid teal;
+}
+
+.toggler-header > span {
+    margin-right: 0.5rem;
+}
+
+.main-section {
+    overflow: hidden;
+    height: 0px;
+    transition: height 0.1s linear;
+}
+
+.main-section.active {
+    height: 60vh;
+    max-height: 60vh;
+}
+
+.sub-section {
+    height: 96%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding:0.5rem;
+}
+
+.layers-container {
+    position: absolute;
+    top: 8vw;
+    left: 0px;
+    margin: 10px;
+    z-index: 2;
+    background-color: #222;
+    color: var(--white);
+    width: 38vw;
+    height: auto;
+    border-radius: 5px;
+}
+
+.layers-container span i {
+    color:var(--primary);
+}
+
+.collapse-toggler {
+    display: flex;
+    align-items: center;
+    font-size: 1.2rem;
+    padding: 0 0.5rem;
+    cursor: pointer;
+}
+
+.collapse-toggler > * {
+    pointer-events: none;
+}
+
+.collapse-toggler span {
+    color:var(--primary);
+    font-size: 1.5rem;
+    margin-right: 0.25rem;
+}
+
+.collapse-section {
+    padding: 0 0.5rem;
+    width: 100%;
+    max-height: 0px;
+    overflow: hidden;
+    transition: max-height 0.2s ease-out;
+    /* background-color: #f1f1f1; */
+}
+
+.collapse-section > .collapse-section {
+    margin-left: 1rem;
+}
+
+.collapse-section > .collapse-toggler {
+    font-size: 14px !important;
+}
+
+.style-toggler {
+    display: flex;
+    margin:0.25rem 0.5rem;
+}
+
+.style-toggler input[type="range"] {
+    accent-color: teal;
+    background: #d7dcdf;
+    width: 50px;
+    margin-right: 1rem;
+    height: 7px;
+    border-radius: 5px;
+    outline:none;
+}
+
+
+#map { 
+    height: 100vh;
+    width: 100vw;
+    z-index: 0;
+}
+
+.mapboxgl-ctrl-geocoder {
+    /* box-shadow: 0px 0px 0.1rem var(--light); */
+    border-radius:5px;
+}
+
+.mapboxgl-ctrl-geocoder--input {
+    background-color: #222;
+}
+
+.metric-marker {
+    font-size: 1rem;
+    font-weight: 800;
+    color: white;
+    font-family: monospace;
+}
