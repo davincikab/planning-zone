@@ -1,10 +1,115 @@
 var map = L.map('map', {
     center: [-33.79405446678091, 151.12099701128386],
     // center: [-34, 151.12099701128386],
-    minZoom:10,
-    zoom: 16,
-    maxZoom:19
+    minZoom:4,
+    zoom: 6,
+    maxZoom:19,
+    zoomControl:false
 });
+
+L.control.zoom({
+    position:'bottomright'
+}).addTo(map);
+
+// geocoder: Specify Australia
+let geocoderControl = new L.Control.Geocoder({ 
+    collapsed:false,
+    geocoder: L.Control.Geocoder.mapbox({ 
+        apiKey: "pk.eyJ1IjoiaGlnaGlxIiwiYSI6ImNsNnVwbHFhMDBsamozbnA1ajBraHlqbmMifQ.mP1mWm5OxGRKfiN0qiH-bg" 
+    }),
+}).addTo(map);
+
+// draw plugin
+let measureControl = new MeasureControl(map);
+// var drawnItems = new L.FeatureGroup();
+// map.addLayer(drawnItems);
+
+// var drawControl = new L.Control.Draw({
+//     position:'topright',
+//     edit: {
+//         // edit:false,
+//         featureGroup:drawnItems
+//     },
+//     draw:{
+//         circlemarker:false,
+//         rectangle:false,
+//         marker:false,
+//         rectangle:false,
+//         circle:false
+//     }
+
+// });
+
+// map.addControl(drawControl);
+
+// // draw start event
+// map.on("draw:drawstart", function (event) {
+//     console.log(event);
+//     drawControl.layerType = event.layerType;
+// });
+
+// map.on("draw:created", function (event) {
+//     console.log(event);
+//     event.layer.layerId = "zsE3x2";
+// });
+
+
+// map.on("draw:deleted", function (event) {
+//     console.log(event);
+// });
+
+// map.on("draw:drawvertex", function (event) {
+//     console.log(event.target);
+//     let layers = event.layers.getLayers();
+//     let coord = layers.map(layer => Object.values(layer.getLatLng()).reverse());  
+
+
+//     let mapLayer;
+//     event.target.eachLayer(layer =>  {
+//         if(layer.editing && !layer.layerId && layer._rings) {
+//             mapLayer = layer;
+
+//             console.log(layer);
+//         }
+//     });
+
+//     console.log(mapLayer);
+//     if(mapLayer) mapLayer.layerId = "zsE3x2";
+
+//     if(coord.length < 2) {
+//         return;
+//     }
+//     // var layer = event.layer;
+//     // console.log(layer);
+//     if(drawControl.layerType == 'polyline') {
+//         let feature = turf.lineString([...coord]);
+//         feature.properties.layerId = "zsE3x2";
+//         console.log(coord);
+
+//         // compute length
+//         let length = turf.length(feature).toFixed(2);
+//         console.log(length);
+
+//     } else {
+//         if(coord.length < 3) {
+//             return;
+//         }
+//         // let coord = layers.map(layer => Object.values(layer.getLatLng()).reverse());        
+//         coord.push(coord[0]);
+//         console.log(coord);
+
+//         // compute area
+//         let area = turf.area(turf.polygon([[...coord]])) / 10000;
+//         console.log(area);
+//     }
+// });
+
+// created event
+// map.on(L.Draw.Event.CREATED, function (event) {
+//     var layer = event.layer;
+
+//     drawnItems.addLayer(layer);
+// });
 
 // L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 //     maxZoom: 19,
@@ -110,6 +215,57 @@ function getlayerInfo(fileTree) {
 
 // console.log(getlayerInfo(sepp));
 
+// feature info on layer click
+// map.addEventListener('click', onMapClick);
+let popup = new L.Popup({maxWidth: 1000});
+
+function onMapClick(e) {
+    var latlngStr = '(' + e.latlng.lat.toFixed(3) + ', ' +         e.latlng.lng.toFixed(3) + ')';
+    var BBOX =         map.getBounds()._southWest.lng+","+map.getBounds()._southWest.lat+","+map.getBounds()._northEast.lng+","
+    +map.getBounds()._northEast.lat;
+
+    var WIDTH= map.getSize().x;
+    var HEIGHT = map.getSize().y;
+
+    var X = map.layerPointToContainerPoint(e.layerPoint).x;
+    var Y = map.layerPointToContainerPoint(e.layerPoint).y;
+
+    var URL = 'https://mapprod3.environment.nsw.gov.au/arcgis/services/Planning/Development_Control/MapServer/WmsServer?service=WMS&VERSION=1.1.1&REQUEST=GetFeatureInfo&layers=5&QUERY_LAYERS=5&STYLES=&BBOX='+BBOX+'&FEATURE_COUNT=5&HEIGHT='+HEIGHT+'&WIDTH='+WIDTH+'&FORMAT=image%2Fpng&INFO_FORMAT=text%2fhtml&SRS=EPSG%3A4326&X='+X+'&Y='+Y;
+    
+    popup.setLatLng(e.latlng);
+    popup.setContent("<iframe src='"+URL+"' width='400' height='100' frameborder='0'></iframe>");
+    map.openPopup(popup);
+
+    // fetch the json data
+    // "http://mapservices.gov.yk.ca/arcgis/services/GeoYukon/GY_OilGas/MapServer/WMSServer?REQUEST=GetFeatureInfo&EXCEPTIONS=application%2Fvnd.ogc.se_xml&BBOX=-140.742239%2C64.444492%2C-131.499347%2C69.721576&SERVICE=WMS&INFO_FORMAT=application%2Fgeojson&QUERY_LAYERS=1&FEATURE_COUNT=50&Layers=1&WIDTH=578&HEIGHT=330&styles=&srs=EPSG%3A4326&version=1.1.1&x=201&y=207&"
+    let jsonUrl = 'https://mapprod3.environment.nsw.gov.au/arcgis/services/Planning/Development_Control/MapServer/WmsServer?service=WMS&VERSION=1.1.1&REQUEST=GetFeatureInfo&layers=5&QUERY_LAYERS=5&STYLES=&BBOX='+BBOX+'&FEATURE_COUNT=5&HEIGHT='+HEIGHT+'&WIDTH='+WIDTH+'&INFO_FORMAT=&INFO_FORMAT=application%2Fgeojson&SRS=EPSG%3A4326&X='+X+'&Y='+Y;
+    console.log(jsonUrl);
+
+    fetch(jsonUrl)
+    .then(res => res.json())
+    .then(data => {
+        console.log(data);
+    })
+    .catch(console.errror)
+}
+
+// Visible by default
+// Basemaps:
+// - LGA Boundary
+// - Surburb Boundary
+// - Cadastre
+// - Elevation Contours (change spelling for this one please to "Contours")
+// > NSW Cadastre:
+// - Lot
+// https://maps.six.nsw.gov.au/arcgis/services/public/NSW_Cadastre/MapServer/WMSServer?request=GetCapabilities&service=WMS
+
+// https://mapprod3.environment.nsw.gov.au/arcgis/services/Planning/SEPP_Precincts_Western_Parkland_City_2021/MapServer/WMSServer?request=GetCapabilities&service=WMS
+// https://mapprod3.environment.nsw.gov.au/arcgis/services/Common/AddressSearch/MapServer/WMSServer?request=GetCapabilities&service=WMS
+let visibleLayers = [
+    'Lot',
+    'Elevation Contours',
+    'LGA Boundary'
+]
 
 
 // Deliverables
@@ -119,3 +275,10 @@ function getlayerInfo(fileTree) {
 // -click on a point or polygon for property and layer information: GetFeatureInfo()
 // -generate a custom pdf report/summary
 // -Add layers (admin side) as we go and find useful add-ons
+
+
+
+
+// The challenge all star S02
+// Riverdale s03
+// Have haves s02-s08

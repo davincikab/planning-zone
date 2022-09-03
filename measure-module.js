@@ -3,39 +3,75 @@ class MeasureControl {
     constructor(map) {
         this.map = map;
         this.labelMarkers = [];
-        this.draw = new MapboxDraw({
-            controls:{
-                point:false,
-                line_string:true, 
-                polygon:true, 
-                trash:true,
-                combine_features:false,
-                uncombine_features:false
+
+        this.drawnItems = new L.FeatureGroup();
+
+        this.drawControl = new L.Control.Draw({
+            position:'topright',
+            edit: {
+                // edit:false,
+                featureGroup:this.drawnItems
+            },
+            draw:{
+                circlemarker:false,
+                rectangle:false,
+                marker:false,
+                rectangle:false,
+                circle:false
             }
+        
         });
 
         this.addToMap();
 
-        // marker/text on the line length or polygon area
-        this.map.on('draw.create', ({ features }) => {
-            console.log(features);
+        
+        this.map.on("draw:drawstart", (event) => {
             // this.handleDrawCreate(features);
+            this.drawControl.layerType = event.layerType;
+            this.drawControl.layerId = this.makeid();
         });
 
-        this.map.on('draw.delete', ({ features }) => {
-            this.handleDrawDelete(features);
+        this.map.on("draw:drawvertex", (event) =>{
+            let layers = event.layers.getLayers();
+            let coord = layers.map(layer => Object.values(layer.getLatLng()).reverse());  
+            let feature;
+
+            if(coord.length < 2) {
+                return;
+            }
+
+            if(this.drawControl.layerType == 'polyline') {
+                feature = turf.lineString([...coord], { layerId:this.drawControl.layerId });        
+            } else {
+                console.log("DRAWING POLYGONS");
+                if(coord.length < 3) {
+                    return;
+                }
+                coord.push(coord[0]);
+                feature = turf.polygon([[...coord]], { layerId:this.drawControl.layerId });
+            }
+            console.log(feature);
+            this.handleDrawMetrics([feature]);
+
         });
 
-        this.map.on('mousemove', (e) => {
-            let {features } = this.draw.getAll();
+        // marker/text on the line length or polygon area
+        this.map.on('draw:created', (event) => {
+            event.layer.layerId = this.drawControl.layerId;
 
-            if(features[0]) this.handleDrawMetrics(features);
-        })
+            // update drawnItems
+            this.drawnItems.addLayer(event.layer);
+        });
+
+        this.map.on('draw:deleted', (event) => {
+            this.handleDrawDelete(event.layers.getLayers());
+        });
     }
 
     // add the draw control
     addToMap() {
-        this.map.addControl(this.draw, 'top-right');
+        this.map.addControl(this.drawControl);
+        this.map.addLayer(this.drawnItems);
     }
 
 
@@ -43,9 +79,15 @@ class MeasureControl {
     updateMetricValue(data) {
         // this.map.getSource('')
         data.features.forEach(ft => {
-            let el = document.createElement('div');
-            el.classList.add('metric-marker');
-            el.innerHTML = ft.properties.metric;
+            let icon = L.divIcon({
+                html:`${ft.properties.metric}`,
+                className:'metric-marker',
+                anchor:[-70, 50]
+            });
+
+            // let el = document.createElement('div');
+            // el.classList.add('metric-marker');
+            // el.innerHTML = ft.properties.metric;
 
             let marker = this.labelMarkers.find(mkr => mkr.layerId == ft.properties.layerId);
             if(marker) {
@@ -53,9 +95,9 @@ class MeasureControl {
                 marker.remove();
             }
 
-            marker = new mapboxgl.Marker({element:el})
+            let coord = [...ft.geometry.coordinates];
+            marker = L.marker([...coord.reverse()], {icon:icon})
             marker
-                .setLngLat(ft.geometry.coordinates)
                 .addTo(this.map);
             
             marker.layerId = ft.properties.layerId;
@@ -82,17 +124,19 @@ class MeasureControl {
             let center;
 
             if(type == 'LineString' && coordinates[0]) {
-                center = turf.center(feature);
+                center = turf.center(feature, { properties:{...feature.properties} });
 
                 center.properties.metric = `${this.computeLineLength(feature)} km`;
             } else if(type == 'Polygon' && coordinates[0].length > 3) {
                 console.log(feature);
 
-                center = turf.center(feature);
+                center = turf.center(feature, { properties:{...feature.properties} });
                 center.properties.metric = `${this.computeArea(feature)} ha`
             } 
 
-            if(center) center.properties.layerId = feature.id || "";
+            console.log(center);
+
+            // if(center) center.properties.layerId = feature.id || "";
             return center;
         }).filter(ft => ft);
 
@@ -103,12 +147,12 @@ class MeasureControl {
     }
 
     // handle draw delete
-    handleDrawDelete(features) {
-        console.log(features);
+    handleDrawDelete(layers) {
+        console.log(layers);
 
-        features.forEach(ft => {
+        layers.forEach(ft => {
             this.labelMarkers = this.labelMarkers.filter(mkr => {
-                if(mkr.layerId !== ft.id) {
+                if(mkr.layerId !== ft.layerId) {
                     return true;
                 }
 
@@ -123,6 +167,20 @@ class MeasureControl {
 
         // measureControl.draw.deleteAll();
     }
+
+    makeid(length=10) {
+        var result           = '';
+        var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789/#@$';
+        var charactersLength = characters.length;
+
+        for ( var i = 0; i < length; i++ ) {
+          result += characters.charAt(Math.floor(Math.random() * 
+            charactersLength));
+        }
+
+        return result;
+    }
+    
 
     // line length
     computeLineLength(feature) {

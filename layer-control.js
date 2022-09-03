@@ -33,7 +33,8 @@ let LayerControl = function(layers, map) {
             bounds:[...layer.bounds],
             layerId:layer.id,
             opacity:0
-        }).addTo(this.map);
+        });
+        // .addTo(this.map);
 
     }
 
