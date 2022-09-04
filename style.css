@@ -142,6 +142,10 @@ body {
     font-weight: 800;
     color: white;
     font-family: monospace;
+    width: 100px;
+    color: black;
+    margin-left: -20px;
+    margin-top: -10px;
 }
 
 
@@ -160,4 +164,45 @@ path.leaflet-interactive {
     margin-top: -4.5px !important;
     border:1px solid white;
     background-color: #FBB03B;
+}
+
+/* geocoder */
+.leaflet-control-geocoder-expanded .leaflet-control-geocoder-form {
+    display: inline-block;
+    background: white;
+    height: 32px;
+    width: 100%;
+}
+
+.leaflet-touch .leaflet-control-geocoder-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 0px;
+    position: absolute;
+}
+
+.leaflet-control-geocoder-form input {
+    font-size: 120%;
+    border: 0;
+    background-color: transparent;
+    width: 246px;
+    line-height: 30px;
+    margin-left:31px;
+}
+
+.leaflet-touch .leaflet-control-geocoder {
+    min-width: 30px;
+    min-height: 30px;
+    background: transparent;
+    border: none;
+}
+
+.leaflet-control-geocoder-alternatives {
+    width: 100%;
+    height: auto;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    margin-top: 10px;
+    background: white;
 }

@@ -80,8 +80,8 @@ class MeasureControl {
         // this.map.getSource('')
         data.features.forEach(ft => {
             let icon = L.divIcon({
-                html:`${ft.properties.metric}`,
-                className:'metric-marker',
+                html:`<div class="metric-marker">${ft.properties.metric}</div>`,
+                className:'div-marker',
                 anchor:[-70, 50]
             });
 
@@ -124,9 +124,13 @@ class MeasureControl {
             let center;
 
             if(type == 'LineString' && coordinates[0]) {
-                center = turf.center(feature, { properties:{...feature.properties} });
+                // center = turf.center(feature, { propert });
 
-                center.properties.metric = `${this.computeLineLength(feature)} km`;
+                let length = this.computeLineLength(feature);
+                center = turf.along(feature, length/2);
+
+                center.properties = {...feature.properties}
+                center.properties.metric = `${length}km`;
             } else if(type == 'Polygon' && coordinates[0].length > 3) {
                 console.log(feature);
 
