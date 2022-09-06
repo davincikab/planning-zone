@@ -29,6 +29,8 @@ class MeasureControl {
             // this.handleDrawCreate(features);
             this.drawControl.layerType = event.layerType;
             this.drawControl.layerId = this.makeid();
+
+            this.map.drawMode = true;
         });
 
         this.map.on("draw:drawvertex", (event) =>{
@@ -61,6 +63,7 @@ class MeasureControl {
 
             // update drawnItems
             this.drawnItems.addLayer(event.layer);
+            this.map.drawMode = false;
         });
 
         this.map.on('draw:deleted', (event) => {

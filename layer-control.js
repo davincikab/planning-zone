@@ -32,7 +32,8 @@ let LayerControl = function(layers, map) {
             attribution: "NSW",
             bounds:[...layer.bounds],
             layerId:layer.id,
-            opacity:0
+            opacity:0,
+            crossOrigin:true
         });
         // .addTo(this.map);
 
@@ -50,15 +51,23 @@ let LayerControl = function(layers, map) {
     this.togglerWMSLayers = (id, opacity) => {
         // console.log(id,":",opacity);
         let layer = this.tileLayers.find(lyr => lyr.options.layerId == id);
+        let value = parseFloat(opacity);
 
-        layer.setOpacity(parseFloat(opacity));
+        if(!this.map.hasLayer(layer)) {
+            layer.addTo(this.map);
+        }
 
+        layer.setOpacity(value);
+
+        if(value == 0) {
+            this.map.removeLayer(layer);
+        }
     }
 
 
     // render the layer on the side tab
     this.renderLayerTogglers = () => {
-        let subsection = document.getElementById("sub-section");
+        let subsection = document.getElementById("custom-overlay");
         // console.log(Object.values(this.layers));
         
         Object.keys(this.layers)

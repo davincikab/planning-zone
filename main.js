@@ -23,21 +23,38 @@ let geocoderControl = new L.Control.Geocoder({
 let measureControl = new MeasureControl(map);
 
 // dark theme
-// let darkTheme  = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}' + (L.Browser.retina ? '@2x.png' : '.png'), {
-//    attribution:'&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>',
-//    subdomains: 'abcd',
-//    maxZoom: 20,
-//    minZoom: 0
-// }).addTo(map);
-
 let lightTheme  = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}' + (L.Browser.retina ? '@2x.png' : '.png'), {
-   attribution:'&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>',
-   subdomains: 'abcd',
-   maxZoom: 20,
-   minZoom: 0
+    attribution:'&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    subdomains: 'abcd',
+    maxZoom: 20,
+    minZoom: 0,
+    opacity:1
 }).addTo(map);
 
+let darkTheme  = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}' + (L.Browser.retina ? '@2x.png' : '.png'), {
+    attribution:'&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    subdomains: 'abcd',
+    maxZoom: 20,
+    minZoom: 0,
+    opacity:0
+}).addTo(map);
 
+// update darkTheme opacity
+let themeSlider = document.querySelectorAll(".dark-theme")[0];
+console.log(themeSlider);
+
+
+themeSlider.oninput = function(e) {
+    let { value } = e.target;
+
+    darkTheme.setOpacity(parseFloat(value));
+
+    if(value > 0) {
+        map.removeLayer(lightTheme);
+    } else {
+        lightTheme.addTo(map);
+    }
+}
 // TileLayer Overlay
 // var nexradd = L.tileLayer.wms("https://mapprod3.environment.nsw.gov.au/arcgis/services/Planning/Development_Control/MapServer/WmsServer", {
 //     layers: '5',
@@ -122,10 +139,12 @@ function getlayerInfo(fileTree) {
 // console.log(getlayerInfo(sepp));
 
 // feature info on layer click
-// map.addEventListener('click', onMapClick);
+map.addEventListener('click', onMapClick);
 let popup = new L.Popup({maxWidth: 1000});
 
 function onMapClick(e) {
+    if(map.drawMode) return;
+
     var latlngStr = '(' + e.latlng.lat.toFixed(3) + ', ' +         e.latlng.lng.toFixed(3) + ')';
     var BBOX =         map.getBounds()._southWest.lng+","+map.getBounds()._southWest.lat+","+map.getBounds()._northEast.lng+","
     +map.getBounds()._northEast.lat;
@@ -139,21 +158,52 @@ function onMapClick(e) {
     var URL = 'https://mapprod3.environment.nsw.gov.au/arcgis/services/Planning/Development_Control/MapServer/WmsServer?service=WMS&VERSION=1.1.1&REQUEST=GetFeatureInfo&layers=5&QUERY_LAYERS=5&STYLES=&BBOX='+BBOX+'&FEATURE_COUNT=5&HEIGHT='+HEIGHT+'&WIDTH='+WIDTH+'&FORMAT=image%2Fpng&INFO_FORMAT=text%2fhtml&SRS=EPSG%3A4326&X='+X+'&Y='+Y;
     
     popup.setLatLng(e.latlng);
-    popup.setContent("<iframe src='"+URL+"' width='400' height='100' frameborder='0'></iframe>");
-    map.openPopup(popup);
+    
 
     // fetch the json data
     // "http://mapservices.gov.yk.ca/arcgis/services/GeoYukon/GY_OilGas/MapServer/WMSServer?REQUEST=GetFeatureInfo&EXCEPTIONS=application%2Fvnd.ogc.se_xml&BBOX=-140.742239%2C64.444492%2C-131.499347%2C69.721576&SERVICE=WMS&INFO_FORMAT=application%2Fgeojson&QUERY_LAYERS=1&FEATURE_COUNT=50&Layers=1&WIDTH=578&HEIGHT=330&styles=&srs=EPSG%3A4326&version=1.1.1&x=201&y=207&"
-    let jsonUrl = 'https://mapprod3.environment.nsw.gov.au/arcgis/services/Planning/Development_Control/MapServer/WmsServer?service=WMS&VERSION=1.1.1&REQUEST=GetFeatureInfo&layers=5&QUERY_LAYERS=5&STYLES=&BBOX='+BBOX+'&FEATURE_COUNT=5&HEIGHT='+HEIGHT+'&WIDTH='+WIDTH+'&INFO_FORMAT=&INFO_FORMAT=application%2Fgeojson&SRS=EPSG%3A4326&X='+X+'&Y='+Y;
+    let jsonUrl = 'https://mapprod3.environment.nsw.gov.au/arcgis/services/Planning/Development_Control/MapServer/WmsServer?service=WMS&VERSION=1.1.1&REQUEST=GetFeatureInfo&layers=5&QUERY_LAYERS=5&STYLES=&BBOX='+BBOX+'&FEATURE_COUNT=5&HEIGHT='+HEIGHT+'&WIDTH='+WIDTH+'&&INFO_FORMAT=application%2Fgeojson&SRS=EPSG%3A4326&X='+X+'&Y='+Y;
     console.log(jsonUrl);
 
-    fetch(jsonUrl)
+    fetch(jsonUrl, {
+        cors:'no-cors'
+    })
     .then(res => res.json())
     .then(data => {
         console.log(data);
+
+        if(data.features[0]) {
+            let { properties } = data.features[0];
+            let keys = Object.keys(properties);
+
+            let rows = keys.map(key => {
+                return `<tr>
+                    <td>${key}</td>
+                    <td>${properties[key]}</td>
+                </tr>`
+            });
+
+            popup.setContent(`<table>
+                <tr>
+                    <th></th>
+                    <th></th>
+                </tr>
+                <tbody>
+                    ${rows.join("")}
+                </tbody>
+            </table>`
+            );
+        } else {
+            popup.setContent("<p>No Feature Found !</p>")
+        }
+
+        map.openPopup(popup);
     })
     .catch(console.errror)
 }
+
+
+
 
 // Visible by default
 // Basemaps:

@@ -32,15 +32,15 @@
                 <div class="sub-section" id="sub-section">
                     <div class="region-title">Victoria</div>
     
-                    <div class="style-toggler" id="dark-mode">
-                        <div class="range-div">
+                    <div class="style-toggler" id="dark-mode-div">
+                        <div class="">
                             <!-- switch -->
-                            <input type="range" name="" id="dark-mode" min="0" max="1" step="0.1">
+                            <input class="dark-theme" type="range" value="0"  min="0" max="1" step="0.1">
                         </div>
                         <div class="toggler-title">Dark Mode</div>
                     </div>
     
-                    <div class="collapse-toggler">
+                    <div class="collapse-toggler ">
                         <span>
                             <i class="fa fa-caret-right"></i>
                         </span>
@@ -48,47 +48,49 @@
                         <div class="toggler-title">Basemaps</div>
                     </div>
     
-                    <div class="collapse-section" id="basemaps">
-                        <div class="style-toggler" id="dark-mode">
+                    <div class="collapse-section " id="basemaps">
+                        <div class="style-toggler" id="">
                             <div class="range-div">
                                 <!-- switch -->
-                                <input type="range" name="" id="dark-mode" min="0" max="1" step="0.1">
+                                <input type="range" name="" id="lga-boundary" min="0" max="1" step="0.1">
                             </div>
                             <div class="toggler-title">LGA Boundary</div>
                         </div>
     
-                        <div class="style-toggler" id="dark-mode">
+                        <div class="style-toggler" id="suburb-boundary">
                             <div class="range-div">
                                 <!-- switch -->
-                                <input type="range" name="" id="dark-mode" min="0" max="1" step="0.1">
+                                <input type="range" name="" id="suburb-boundary" min="0" max="1" step="0.1">
                             </div>
                             <div class="toggler-title">Surburb Boundary</div>
                         </div>
     
-                        <div class="style-toggler" id="dark-mode">
+                        <div class="style-toggler" id="cadastre">
                             <div class="range-div">
                                 <!-- switch -->
-                                <input type="range" name="" id="dark-mode" min="0" max="1" step="0.1" disabled>
+                                <input type="range" name="" id="cadastre" min="0" max="1" step="0.1" disabled>
                             </div>
                             <div class="toggler-title">Cadastre</div>
                         </div>
     
-                        <div class="style-toggler" id="dark-mode">
+                        <div class="style-toggler" id="elevation-contours">
                             <div class="range-div">
                                 <!-- switch -->
-                                <input type="range" name="" id="dark-mode" min="0" max="1" step="0.1">
+                                <input type="range" name="" id="elevation-contours" min="0" max="1" step="0.1">
                             </div>
                             <div class="toggler-title">Elevation Controure</div>
                         </div>
     
-                        <div class="style-toggler" id="dark-mode">
+                        <div class="style-toggler" id="aerial-imagery">
                             <div class="range-div">
                                 <!-- switch -->
-                                <input type="range" name="" id="dark-mode" min="0" max="1" step="0.1">
+                                <input type="range" name="" id="aerial-imagery" min="0" max="1" step="0.1">
                             </div>
                             <div class="toggler-title">Aerial Imagery</div>
                         </div>
-                    </div>             
+                    </div> 
+                    
+                    <div id="custom-overlay"></div>
     
                 </div>
             </div>
@@ -96,22 +98,115 @@
     
         </div>
         <div id="map"></div>
+
+        <div class="tools-section">
+            <div class="refresh-button"></div>
+        </div>
+        <div class="open-pdf-view" id="open-pdf-view">
+            See Report PDF
+        </div>
+
+        <div class="pdf-div d-none" id="pdf-div">
+            <div class="close-btn" id="close-pdf">
+                <i class="fa fa-times"></i>
+            </div>
+
+            <div class="print-pdf" id="print-pdf">
+                Print <i class="fa fa-file-pdf"></i>
+            </div>
+
+            <div class="pdf-header">
+                <div class="logo-section">
+                    <img src="logo.PNG" alt="">
+                </div>
+
+                <div class="title-section">
+                    <div class="slant-bg"></div>
+                    <div class="text">
+                        <h2>Property Report</h2>
+                        <div class="address">57 MEMORIAL AVENUE LIVERPOOL 217</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pdf-body">
+                <div class="section-intro">
+                    <div class="mini-map" id="mini-map">
+                        <!-- display the map bg color -->
+                    </div>
+
+                    <div class="map-info" id="map-info">
+                        <div class="section-title">Property Details</div>
+
+                        <div class="section-info">
+                            <div class="item">
+                                <div>Address:</div>
+                                <div>57 MEMORIAL AVENUE LIVERPOOL 2170</div>
+                            </div>
+
+                            <div class="item">
+                                <div>Lot/Section/Plan No:</div>
+                                <div>1/-/DP1027804</div>
+                            </div>
+
+                            <div class="item">
+                                <div>Council:</div>
+                                <div>LIVERPOOL CITY COUNCIL</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">
+                        Summary of planning controls
+                    </div>
+
+                    <div class="section-body">
+                        <div class="section-text">
+                            Planning controls held within the Planning Database are summarised below. The property may be
+                            affected by additional planning controls not outlined in this report. Please contact your council for
+                            more information
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Detailed planning information</div>
+                    <div class="section-sub-title">State Environmental Planning Policies which apply to this property</div>
+                    <div class="section-body"></div>
+                </div>
+            </div>
+
+
+        </div>
     </div>
 
+    <!-- CDN Files -->
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
     integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
     crossorigin=""></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js" integrity="sha512-ozq8xQKq6urvuU6jNgkfqAmT7jKN2XumbrX1JiB3TnF7tI48DPI4Gy1GXKD/V3EExgAs1V+pRO7vwtS1LHg0Gw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
+    <script src="assets/html2canvas.min.js"></script>
+    <script>
+        const { jsPDF } = jspdf;
+    </script>
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
     <script src='https://unpkg.com/@turf/turf@6/turf.min.js'></script>
 
+    <!-- local dependencies -->
+    <script src="assets/from_html.js"></script>
+    <script src="assets/split_text_to_size.js"></script>
+    <script src="assets/standard_fonts_metrics.js"></script>
+
+    <!-- local custom code -->
     <script src="style.js"></script>
     <script src="layers.js"></script>
     <script src="layer-control.js"></script>
     <script src="measure-module.js"></script>
+    <script src="pdf-module.js"></script>
 
     <script src="main.js"></script>
 </body>
