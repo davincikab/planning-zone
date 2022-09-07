@@ -1,8 +1,8 @@
 var map = L.map('map', {
-    center: [-33.79405446678091, 151.12099701128386],
-    // center: [-34, 151.12099701128386],
-    minZoom:4,
-    zoom: 6,
+    // center: [-33.79405446678091, 151.12099701128386],
+    center: {lat: -33.911892129479526, lng: 151.20423316431697},
+    minZoom:8,
+    zoom: 14,
     maxZoom:19,
     zoomControl:false
 });
@@ -143,8 +143,9 @@ map.addEventListener('click', onMapClick);
 let popup = new L.Popup({maxWidth: 1000});
 
 function onMapClick(e) {
-    if(map.drawMode) return;
-
+    if(map.drawMode && !layerControl.activeLayer) return;
+    
+    console.log(layerControl.activeLayer);
     var latlngStr = '(' + e.latlng.lat.toFixed(3) + ', ' +         e.latlng.lng.toFixed(3) + ')';
     var BBOX =         map.getBounds()._southWest.lng+","+map.getBounds()._southWest.lat+","+map.getBounds()._northEast.lng+","
     +map.getBounds()._northEast.lat;
@@ -155,16 +156,17 @@ function onMapClick(e) {
     var X = map.layerPointToContainerPoint(e.layerPoint).x;
     var Y = map.layerPointToContainerPoint(e.layerPoint).y;
 
-    var URL = 'https://mapprod3.environment.nsw.gov.au/arcgis/services/Planning/Development_Control/MapServer/WmsServer?service=WMS&VERSION=1.1.1&REQUEST=GetFeatureInfo&layers=5&QUERY_LAYERS=5&STYLES=&BBOX='+BBOX+'&FEATURE_COUNT=5&HEIGHT='+HEIGHT+'&WIDTH='+WIDTH+'&FORMAT=image%2Fpng&INFO_FORMAT=text%2fhtml&SRS=EPSG%3A4326&X='+X+'&Y='+Y;
+    let { layers } = layerControl.activeLayer.wmsParams;
+    var URL = `${layerControl.activeLayer._url}?service=WMS&VERSION=1.1.1&REQUEST=GetFeatureInfo&layers=${layers}&QUERY_LAYERS=5&STYLES=&BBOX=${BBOX}&FEATURE_COUNT=5&HEIGHT=${HEIGHT}&WIDTH=${WIDTH}&FORMAT=image%2Fpng&INFO_FORMAT=text%2fhtml&SRS=EPSG%3A4326&X=${X}&Y=${Y}`;
     
     popup.setLatLng(e.latlng);
     
 
     // fetch the json data
-    // "http://mapservices.gov.yk.ca/arcgis/services/GeoYukon/GY_OilGas/MapServer/WMSServer?REQUEST=GetFeatureInfo&EXCEPTIONS=application%2Fvnd.ogc.se_xml&BBOX=-140.742239%2C64.444492%2C-131.499347%2C69.721576&SERVICE=WMS&INFO_FORMAT=application%2Fgeojson&QUERY_LAYERS=1&FEATURE_COUNT=50&Layers=1&WIDTH=578&HEIGHT=330&styles=&srs=EPSG%3A4326&version=1.1.1&x=201&y=207&"
-    let jsonUrl = 'https://mapprod3.environment.nsw.gov.au/arcgis/services/Planning/Development_Control/MapServer/WmsServer?service=WMS&VERSION=1.1.1&REQUEST=GetFeatureInfo&layers=5&QUERY_LAYERS=5&STYLES=&BBOX='+BBOX+'&FEATURE_COUNT=5&HEIGHT='+HEIGHT+'&WIDTH='+WIDTH+'&&INFO_FORMAT=application%2Fgeojson&SRS=EPSG%3A4326&X='+X+'&Y='+Y;
+    let jsonUrl = `${layerControl.activeLayer._url}?service=WMS&VERSION=1.1.1&REQUEST=GetFeatureInfo&layers=${layers}&QUERY_LAYERS=${layers}&STYLES=&BBOX=${BBOX}&FEATURE_COUNT=5&HEIGHT=${HEIGHT}&WIDTH=${WIDTH}&INFO_FORMAT=application%2Fgeojson&SRS=EPSG%3A4326&X=${X}&Y=${Y}`;
     console.log(jsonUrl);
 
+    
     fetch(jsonUrl, {
         cors:'no-cors'
     })
@@ -178,7 +180,7 @@ function onMapClick(e) {
 
             let rows = keys.map(key => {
                 return `<tr>
-                    <td>${key}</td>
+                    <td class="keys">${key}</td>
                     <td>${properties[key]}</td>
                 </tr>`
             });

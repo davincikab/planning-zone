@@ -2,6 +2,7 @@
 let LayerControl = function(layers, map) {
     this.layers = layers;
     this.map = map;
+    this.activeLayer;
 
     this.init = () => {
         this.renderLayerTogglers();
@@ -16,6 +17,7 @@ let LayerControl = function(layers, map) {
         }, []);
 
         this.fireTogglerListeners();
+        // this.map.on("click", this.handleMapClick);
     }
 
 
@@ -55,12 +57,14 @@ let LayerControl = function(layers, map) {
 
         if(!this.map.hasLayer(layer)) {
             layer.addTo(this.map);
+            this.activeLayer = layer;
         }
 
         layer.setOpacity(value);
 
         if(value == 0) {
             this.map.removeLayer(layer);
+            this.activeLayer = null;
         }
     }
 
@@ -118,6 +122,12 @@ let LayerControl = function(layers, map) {
                 this.togglerWMSLayers(id, value);
             }
         });
+    }
+
+
+    // layer click events
+    this.handleMapClick = (e) => {
+        
     }
     
 };
