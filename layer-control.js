@@ -2,14 +2,19 @@
 let LayerControl = function(layers, map) {
     this.layers = layers;
     this.map = map;
-    this.activeLayer;
+    this.activeLayer = [];
 
     this.init = () => {
         this.renderLayerTogglers();
 
         // 
         this.tileLayers = Object.values(this.layers).map(src => {
-            return src.layers.map((lyr) => this.addLayerToMap(lyr, src.source))
+            if(src.isProperty) {
+                return src.layers.map((lyr) => this.renderPropertyWms(lyr, src.source))
+            } else {
+                return src.layers.map((lyr) => this.addLayerToMap(lyr, src.source))
+            }
+            
         }).reduce((a,b) => {
             a = [...a, ...b];
 
@@ -24,10 +29,11 @@ let LayerControl = function(layers, map) {
     // render the layers on the tab-section
     // add the layer to map
     this.addLayerToMap = (layer, src) => {
-
+        // let requestLayers = layer.layers ? layer.layers.join()
+        let requestStyles = layer.layers ? layer.layers.map(lyr => 'default').join(",") : "default";
         return L.tileLayer.wms(`${src}`, {
             layers: `${layer.layerName}`,
-            styles:'default',
+            styles:requestStyles,
             format: 'image/png',
             transparent: true,
             crs:L.CRS.EPSG4326,
@@ -35,10 +41,31 @@ let LayerControl = function(layers, map) {
             bounds:[...layer.bounds],
             layerId:layer.id,
             opacity:0,
+            name:layer.name,
+            layerId:layer.id,
             crossOrigin:true
         });
-        // .addTo(this.map);
 
+    }
+
+    this.renderPropertyWms = (layer, source) => {
+        let requestStyles = layer.layers ? layer.layers.map(lyr => 'default').join(",") : "default";
+
+        return L.tileLayer.wms(source, {
+            layers: `show:${layer.layerName}`,
+            styles:requestStyles,
+            format: 'png',
+            transparent: true,
+            crs:L.CRS.EPSG3857,
+            bboxSR:3857,
+            imageSR:3857,
+            attribution: "NSW",
+            layerId:layer.id,
+            f:'image',
+            size:'256,256',
+            name:layer.name,
+            legendImage:layer.legendImage
+        });
     }
 
     this.togglerBasemap = (layer) => {
@@ -56,16 +83,51 @@ let LayerControl = function(layers, map) {
         let value = parseFloat(opacity);
 
         if(!this.map.hasLayer(layer)) {
+            console.log(layer);
+
             layer.addTo(this.map);
-            this.activeLayer = layer;
+            // this.activeLayer = layer;
+            this.activeLayer.push(layer);
+            // this.map.fitBounds()
         }
 
         layer.setOpacity(value);
 
         if(value == 0) {
             this.map.removeLayer(layer);
-            this.activeLayer = null;
+            this.activeLayer = this.activeLayer.filter(lyr => lyr.options.layerId != layer.options.layerId);
+
+            let element = document.getElementById(`${layer.wmsParams.layerId}-${layer.wmsParams.layers}`);
+
+            if(element) {
+                element.remove();
+            }
+
+        } else {
+            this.toggleLegendContainer(layer);
         }
+    }
+
+    this.toggleLegendContainer = (layer) => {
+        let imageUrl = `${layer._url}?request=GetLegendGraphic%26version=1.3.0%26format=image/png%26layer=${layer.wmsParams.layers}`;
+
+        if(layer.wmsParams.legendImage) {
+            imageUrl = `data:image/png;base64,${layer.wmsParams.legendImage}`
+        }
+
+        let legendContent = `<div class="legend-item" id="${layer.wmsParams.layerId}-${layer.wmsParams.layers}">
+            <div class="legend-text">${layer.wmsParams.name}</div>
+            <img src="${imageUrl}" alt="">
+        </div>`;
+
+
+        let element = document.getElementById(`${layer.wmsParams.layerId}-${layer.wmsParams.layers}`);
+        console.log(layer.wmsParams.name.includes("Label"));
+
+        if(!element && !layer.wmsParams.name.includes("Label")) {
+            document.getElementById("legend-body").innerHTML += legendContent;
+        }
+
     }
 
 
@@ -79,11 +141,10 @@ let LayerControl = function(layers, map) {
             let source = this.layers[key];
 
             subsection.innerHTML += `<div class="collapse-toggler">
-                <span>
-                    <i class="fa fa-caret-right"></i>
-                </span>
-
                 <div class="toggler-title">${key}</div>
+                <span>
+                    <i class="fa fa-angle-down"></i>
+                </span>
             </div>`;
 
             let docFrag = document.createDocumentFragment();
@@ -135,7 +196,7 @@ let LayerControl = function(layers, map) {
 let Collapse = function() {
     this.activeCollapse = null;
     this.activeToggler = null;
-    this.mainToggler = document.querySelector(".toggler-header");
+    this.mainTogglers = document.querySelectorAll(".toggler-header");
     this.collapseTogglers = document.querySelectorAll(".collapse-toggler");
 
     this.fireListeners = () => {
@@ -148,10 +209,15 @@ let Collapse = function() {
         }
 
 
-        this.mainToggler.onclick = () => {
-            let mainSection = document.querySelector(".main-section");
-            mainSection.classList.toggle('active');
-        }
+        this.mainTogglers.forEach(toggler => {
+
+            toggler.onclick = (e) => {
+                console.log("Header Click")
+                var mainSection = toggler.nextElementSibling;
+                mainSection.classList.toggle('active');
+            }
+        });
+
     }
 
     this.toggleCollapse = (toggler) => {
@@ -160,11 +226,12 @@ let Collapse = function() {
 
         if(content.style.maxHeight != "0px") {
             content.style.maxHeight = 0;
+            toggler.classList.remove("active");
         } else {
             console.log("Logged");
 
             toggler.classList.add("active");
-            content.style.maxHeight = content.scrollHeight + "px";
+            content.style.maxHeight = content.scrollHeight+15 + "px";
         }
     }
 
@@ -172,3 +239,6 @@ let Collapse = function() {
         this.activeCollapse = element;
     }
 }
+
+// https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/EPI_Primary_Planning_Layers/MapServer/export/?service=WMS&request=GetMap&layers=0&styles=default&format=png32&transparent=true&version=1.1.1&f=image&bboxSR=102100&imageSR=102100&layerId=heritage&width=256&height=256&srs=EPSG%3A3857&bbox=16713414.856723502,-3964941.5312086623,16715860.841628628,-3962495.546303537
+// https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/EPI_Primary_Planning_Layers/MapServer/export?dpi=96&transparent=true&format=png32&layers=show%3A0&bbox=16710892.792349916%2C-3959912.571821475%2C16713582.42028277%2C-3957528.692001768&bboxSR=102100&imageSR=102100&size=563%2C499&f=image

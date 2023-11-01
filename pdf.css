@@ -1,0 +1,48 @@
+.info-click-feature {
+    border-left: 1px solid #939393;
+    margin: 0.5rem;
+    padding: 0 8px;
+    font-weight: 500;
+}
+
+.info-click-feature-attribute {
+    display: block;
+    font-size: .95rem;
+    line-height: 1.5;
+    margin-bottom: 4px;
+    width: 100%;
+}
+
+.info-click-feature-attribute-value {
+    font-size: 0.8rem;
+}
+
+.mini-map img {
+    object-fit: cover;
+    width: 300px;
+    height: 280px;
+}
+
+.popup-header {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    font-size: 15px;
+}
+
+.popup-content .popup-body {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.leaflet-popup-content table {
+    padding:10px;
+}
+
+.table tr .keys {
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+td.keys {
+    text-transform: capitalize;
+}

@@ -4,10 +4,14 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Map Application</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
-    integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
-    crossorigin=""/>
+    <title>Plan Zone</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw-src.css" integrity="sha512-vJfMKRRm4c4UupyPwGUZI8U651mSzbmmPgR3sdE3LcwBPsdGeARvUM5EcSTg34DK8YIRiIo+oJwNfZPMKEQyug==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css" integrity="sha512-1sCRPdkRXhBV2PBLUdRb4tMg1w2YPf37qatUFeS7zlBy7jJI8Lf4VHwWfZZfpXtYSLy85pkm9GaYVYMfw5BC1A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -15,11 +19,80 @@
     <!-- geocoder -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
 
+     <!-- Load Esri Leaflet from CDN -->
+     <script src="https://unpkg.com/esri-leaflet@3.0.10/dist/esri-leaflet.js"></script>
+
+     <!-- Load Esri Leaflet Vector from CDN -->
+     <script src="https://unpkg.com/esri-leaflet-vector@4.0.2/dist/esri-leaflet-vector.js" crossorigin=""></script>
+
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="main-container">
-        <div class="layers-container active">
+    <div class="main-container" id="map-container">
+        <div class="spinner-container d-none" id="spinner-container">
+            <div class="spinner"></div>
+            <p id="spinner-info">Loading Data ...</p>
+        </div>
+        <div class="info-container active d-none" id="info-container">
+            <div class="toggler-header">
+                <span>
+                    <i class="fa fa-caret-right"></i>
+                </span>
+    
+                <div class="toggler-title">Info</div>
+            </div>
+
+            <div class="main-section active">
+                <div class="tabs-section">
+                    <div class="tab active" data-target="general-info">General</div>
+                    <div class="tab" data-target="planning-info">Planning</div>
+                </div>
+
+                <div class="tabs-body">
+                    <div class="tab_inner_item" id="general-info">
+                        <div class="lot-info d-none" id="lot-info">
+                            <div class="tab-title">Lot Details</div>
+                            <div class="info-click-feature" id="lot-info-section">
+
+                            </div>
+                        </div>
+
+                        <div id="admin-info">
+                            <div class="tab-title">Administrative Information</div>
+                            <div class="info-click-feature" id="boundary-info">
+
+                                <div class="info-click-feature-attribute">
+                                    <div class="info-click-feature-attribute-name">Surbub:</div>
+                                    <div class="info-click-feature-attribute-value" id="suburb-value">Galston</div>
+                                </div>
+
+                                <div class="info-click-feature-attribute">
+                                    <div class="info-click-feature-attribute-name">Local Government Area:</div>
+                                    <div class="info-click-feature-attribute-value" id="lga-value">Galston</div>
+                                </div>
+
+                                <div class="info-click-feature-attribute">
+                                    <div class="info-click-feature-attribute-name">Federal Electorate District:</div>
+                                    <div class="info-click-feature-attribute-value" id="fedaral-value">Berowra</div>
+                                </div>
+
+                                <div class="info-click-feature-attribute">
+                                    <div class="info-click-feature-attribute-name">State Electorate District:</div>
+                                    <div class="info-click-feature-attribute-value" id="state-value">Galston</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab_inner_item d-none" id="planning-info">
+                        <div class="tab-title">Administrative Information</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="layers-container d-none" id="layer-container">
             <div class="toggler-header">
                 <span>
                     <i class="fa fa-caret-right"></i>
@@ -29,68 +102,85 @@
             </div>
     
             <div class="main-section active">
-                <div class="sub-section" id="sub-section">
-                    <div class="region-title">Victoria</div>
-    
-                    <div class="style-toggler" id="dark-mode-div">
-                        <div class="">
-                            <!-- switch -->
-                            <input class="dark-theme" type="range" value="0"  min="0" max="1" step="0.1">
+                <div class="sub-section" id="sub-section">      
+                    <div id="boundary-layer">
+                        <div class="collapse-toggler">
+                            <div class="toggler-title">Boundaries</div>
+                            <span>
+                                <i class="fa fa-angle-down"></i>
+                            </span>
                         </div>
-                        <div class="toggler-title">Dark Mode</div>
+                        <div class="collapse-section" id="planning-layers" style="max-height: 0px;">
+                            <div class="style-toggler" id="lga-feature">
+                                <div class="range-div">
+                                    <input class="feature-range-slider" type="range" value="0" id="lga-feature" min="0" max="1" step="0.1">
+                                </div>
+                                <div class="toggler-title">Local Government Area</div>
+                            </div>
+
+                            <div class="style-toggler" id="suburb-feature">
+                                <div class="range-div">
+                                    <input class="feature-range-slider" type="range" value="0" id="suburb-feature" min="0" max="1" step="0.1">
+                                </div>
+                                <div class="toggler-title">Suburbs</div>
+                            </div>
+
+                            <div class="style-toggler" id="cadastre-feature">
+                                <div class="range-div">
+                                    <input class="feature-range-slider" type="range" value="0.8" id="cadastre-feature" min="0" max="1" step="0.1">
+                                </div>
+                                <div class="toggler-title">Cadastre</div>
+                            </div>
+
+                            <div class="style-toggler" id="state-electoral-feature">
+                                <div class="range-div">
+                                    <input class="feature-range-slider" type="range" value="0" id="state-electoral-feature" min="0" max="1" step="0.1">
+                                </div>
+                                <div class="toggler-title">State Electoral Districts</div>
+                            </div>
+
+                            <div class="style-toggler" id="federal-electoral-feature">
+                                <div class="range-div">
+                                    <input class="feature-range-slider" type="range" value="0" id="federal-electoral-feature" min="0" max="1" step="0.1">
+                                </div>
+                                <div class="toggler-title">Federal Electoral Districts</div>
+                            </div>
+
+                            <!-- <div class="style-toggler" id="nsw-regions-feature">
+                                <div class="range-div">
+                                    <input class="feature-range-slider" type="range" value="0" id="nsw-regions-feature" min="0" max="1" step="0.1">
+                                </div>
+                                <div class="toggler-title">NSW Regions and Districts</div>
+                            </div> -->
+
+                        </div> 
+                    </div>   
+
+                    <div id="custom-overlay">
+
                     </div>
-    
-                    <div class="collapse-toggler ">
-                        <span>
-                            <i class="fa fa-caret-right"></i>
-                        </span>
-            
-                        <div class="toggler-title">Basemaps</div>
+
+                    <div class="custom-feature-layer">
+
+                        <div class="feature-toggler">
+                            <label class="switch" id="contours">
+                                <input class="feature-slider" type="checkbox" id="contours" />
+                                <span class="slider round"></span>
+                            </label>
+
+                            <div class="toggler-title">Contours</div>
+                        </div>
+
+                        <div class="feature-toggler">
+                            <label class="switch" id="easements">
+                                <input class="feature-slider" type="checkbox" id="easements"/>
+                                <span class="slider round"></span>
+                            </label>
+
+                            <div class="toggler-title">Easement</div>
+                        </div>
+                        
                     </div>
-    
-                    <div class="collapse-section " id="basemaps">
-                        <div class="style-toggler" id="">
-                            <div class="range-div">
-                                <!-- switch -->
-                                <input type="range" name="" id="lga-boundary" min="0" max="1" step="0.1">
-                            </div>
-                            <div class="toggler-title">LGA Boundary</div>
-                        </div>
-    
-                        <div class="style-toggler" id="suburb-boundary">
-                            <div class="range-div">
-                                <!-- switch -->
-                                <input type="range" name="" id="suburb-boundary" min="0" max="1" step="0.1">
-                            </div>
-                            <div class="toggler-title">Surburb Boundary</div>
-                        </div>
-    
-                        <div class="style-toggler" id="cadastre">
-                            <div class="range-div">
-                                <!-- switch -->
-                                <input type="range" name="" id="cadastre" min="0" max="1" step="0.1" disabled>
-                            </div>
-                            <div class="toggler-title">Cadastre</div>
-                        </div>
-    
-                        <div class="style-toggler" id="elevation-contours">
-                            <div class="range-div">
-                                <!-- switch -->
-                                <input type="range" name="" id="elevation-contours" min="0" max="1" step="0.1">
-                            </div>
-                            <div class="toggler-title">Elevation Controure</div>
-                        </div>
-    
-                        <div class="style-toggler" id="aerial-imagery">
-                            <div class="range-div">
-                                <!-- switch -->
-                                <input type="range" name="" id="aerial-imagery" min="0" max="1" step="0.1">
-                            </div>
-                            <div class="toggler-title">Aerial Imagery</div>
-                        </div>
-                    </div> 
-                    
-                    <div id="custom-overlay"></div>
     
                 </div>
             </div>
@@ -102,9 +192,71 @@
         <div class="tools-section">
             <div class="refresh-button"></div>
         </div>
-        <div class="open-pdf-view" id="open-pdf-view">
-            See Report PDF
+
+        <div class="control-group d-none">
+            <div class="open-pdf-view" id="open-pdf-view">
+                See Report PDF
+            </div>
+
+            <div class="open-pdf-view" id="print-map-image">
+                Print Map
+            </div>
         </div>
+
+        <a download="map.png" href="#" class="d-none" id="download-link">download</a>
+
+        <div class="wms-section d-none id="wms-section">
+            <div class="section-header">Custom WMS</div>
+            <form action="oost" id="wms-form">
+
+                <div class="input-group">
+                    <div class="">WMS Server Link</div>
+                    <input type="text" name="wms-url" id="wms-link" cols="35" rows="2" />
+                </div>
+
+                <div class="input-group">
+                    <div class="">Layer Name/Id</div>
+                    <input type="text" name="layer-id" id="layer-id" />
+                </div>
+                
+                <button class="submit-section" type="submit">Submit</button>
+            </form>
+            
+        </div>
+
+        <div class="image-modal d-none" id="image-modal">
+            <div class="close-btn" id="close-img">
+                <i class="fa fa-times"></i>
+            </div>
+
+            <div class="download-btn" id="donwnload-img">
+                <i class="fa fa-download"></i>
+                Download
+            </div>
+
+            <div class="modal-container" id="modal-container">
+                <div class="modal-container__inner">
+                    <div class="image-section" id="image-section"></div>
+
+                    <div class="image-details">
+                        <div class="detail-section">
+                            <img src="assets/logo.PNG" alt="logo" width="100px">
+
+                            <div class="detail-section"></div>
+                        </div>
+
+                        <div class="detail-section">
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. <br>
+                            Proin feugiat nibh ac ultrices scelerisque. <br>
+                            Praesent rhoncus vehicula orci, eget euismod purus ultrices non.<br>
+                        </div>
+                        <div class="detail-section"></div>
+                        <div class="detail-section"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
 
         <div class="pdf-div d-none" id="pdf-div">
             <div class="close-btn" id="close-pdf">
@@ -124,7 +276,7 @@
                     <div class="slant-bg"></div>
                     <div class="text">
                         <h2>Property Report</h2>
-                        <div class="address">57 MEMORIAL AVENUE LIVERPOOL 217</div>
+                        <div class="address" id="report-address">57 MEMORIAL AVENUE LIVERPOOL 217</div>
                     </div>
                 </div>
             </div>
@@ -141,17 +293,17 @@
                         <div class="section-info">
                             <div class="item">
                                 <div>Address:</div>
-                                <div>57 MEMORIAL AVENUE LIVERPOOL 2170</div>
+                                <div id="details-address">57 MEMORIAL AVENUE LIVERPOOL 2170</div>
                             </div>
 
-                            <div class="item">
+                            <div class="item" id="property-info">
                                 <div>Lot/Section/Plan No:</div>
-                                <div>1/-/DP1027804</div>
+                                <div id="lot-number">1/-/DP1027804</div>
                             </div>
 
                             <div class="item">
                                 <div>Council:</div>
-                                <div>LIVERPOOL CITY COUNCIL</div>
+                                <div id="city-council">LIVERPOOL CITY COUNCIL</div>
                             </div>
                         </div>
                     </div>
@@ -159,7 +311,7 @@
 
                 <div class="section">
                     <div class="section-title">
-                        Summary of planning controls
+                        Summary of Planning controls
                     </div>
 
                     <div class="section-body">
@@ -168,31 +320,86 @@
                             affected by additional planning controls not outlined in this report. Please contact your council for
                             more information
                         </div>
+
+                        <div id="summary-info">
+                            <div id="lot-summary"></div>
+                            <div id="admin-summary"></div>
+                        </div>
                     </div>
                 </div>
 
                 <div class="section">
                     <div class="section-title">Detailed planning information</div>
                     <div class="section-sub-title">State Environmental Planning Policies which apply to this property</div>
-                    <div class="section-body"></div>
+                    <div class="section-body" id="detailed-info">
+
+                    </div>
                 </div>
             </div>
 
 
         </div>
+
+        <div class="legend-container" id="legend-container">
+            <div class="legend-header toggler-header">
+                <span>
+                    <i class="fa fa-caret-right"></i>
+                </span>
+                Legend
+            </div>
+            <div class="legend-body main-section" id="legend-body">
+                Legend
+            </div>
+        </div>
     </div>
 
     <!-- CDN Files -->
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+    <!-- <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
     integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
-    crossorigin=""></script>
+    crossorigin=""></script> -->
+
+    <script>
+        // tab togglers
+        const tabs = document.querySelectorAll(".tab");
+        let activeTab = document.querySelector(".tab.active");
+        const tabItems = document.querySelectorAll('.tab_inner_item');
+
+        tabs.forEach(tab => {
+            tab.onclick = (e) => {
+                let { dataset: {target }} = e.target;
+                console.log(target);
+                toggleTabs(target);   
+                if(e.target !== activeTab) {
+                    e.target.classList.add("active");
+                    activeTab.classList.remove("active");
+                } 
+
+                activeTab = e.target;
+            }
+        });
+
+        function toggleTabs(tabItemId) {
+            tabItems.forEach(tabItem => {
+                if(tabItem.id == tabItemId) {
+                    tabItem.classList.remove('d-none');
+                } else {
+                    tabItem.classList.add('d-none');
+                }
+            })
+        }
+    </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js" integrity="sha512-ozq8xQKq6urvuU6jNgkfqAmT7jKN2XumbrX1JiB3TnF7tI48DPI4Gy1GXKD/V3EExgAs1V+pRO7vwtS1LHg0Gw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="assets/html2canvas.min.js"></script>
+    <script src="dom-to-image.min.js"></script>
     <script>
         const { jsPDF } = jspdf;
     </script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.css">
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.js"></script>
+
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
     <script src='https://unpkg.com/@turf/turf@6/turf.min.js'></script>
 
@@ -206,8 +413,12 @@
     <script src="layers.js"></script>
     <script src="layer-control.js"></script>
     <script src="measure-module.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/xml-js@1.6.11/dist/xml-js.min.js"></script>
+    <script src="main.js"></script>
+
     <script src="pdf-module.js"></script>
 
-    <script src="main.js"></script>
+    <script src="data_columns.js"></script>
 </body>
 </html>
