@@ -29,29 +29,37 @@ let LayerControl = function(layers, map) {
     // render the layers on the tab-section
     // add the layer to map
     this.addLayerToMap = (layer, src) => {
+        // console.log(layer);
+
         // let requestLayers = layer.layers ? layer.layers.join()
         let requestStyles = layer.layers ? layer.layers.map(lyr => 'default').join(",") : "default";
-        return L.tileLayer.wms(`${src}`, {
+        let wmsLayer = L.tileLayer.wms(`${src}`, {
             layers: `${layer.layerName}`,
             styles:requestStyles,
             format: 'image/png',
             transparent: true,
             crs:L.CRS.EPSG4326,
             attribution: "NSW",
-            bounds:[...layer.bounds],
+            // bounds:layer.bo[...layer.bounds],
             layerId:layer.id,
-            opacity:0,
+            opacity:layer.opacity,
             name:layer.name,
             layerId:layer.id,
             crossOrigin:true
         });
 
+        if(layer.isVisible) { 
+            // wmsLayer.addTo(map); 
+            this.activeLayer.push(wmsLayer);
+        }
+
+        return wmsLayer;
     }
 
     this.renderPropertyWms = (layer, source) => {
         let requestStyles = layer.layers ? layer.layers.map(lyr => 'default').join(",") : "default";
 
-        return L.tileLayer.wms(source, {
+        let tileWms = L.tileLayer.wms(source, {
             layers: `show:${layer.layerName}`,
             styles:requestStyles,
             format: 'png',
@@ -66,6 +74,10 @@ let LayerControl = function(layers, map) {
             name:layer.name,
             legendImage:layer.legendImage
         });
+
+        tileWms.isProperty = true;
+
+        return tileWms;
     }
 
     this.togglerBasemap = (layer) => {
@@ -94,6 +106,7 @@ let LayerControl = function(layers, map) {
         layer.setOpacity(value);
 
         if(value == 0) {
+            console.log("Remove Feature");
             this.map.removeLayer(layer);
             this.activeLayer = this.activeLayer.filter(lyr => lyr.options.layerId != layer.options.layerId);
 
@@ -158,7 +171,7 @@ let LayerControl = function(layers, map) {
             let wmsLayers = source.layers.map(lyr => {
                 return `<div class="style-toggler" id="${lyr.id}">
                     <div class="range-div">
-                        <input class="opacity-slider" type="range" value="0" id="${lyr.id}" min="0" max="1" step="0.1">
+                        <input class="opacity-slider" type="range" id="${lyr.id}" min="0.01" value="${lyr.opacity}" max="1" step="0.1">
                     </div>
                     <div class="toggler-title">${lyr.name}</div>
                 </div>`;
@@ -203,7 +216,6 @@ let Collapse = function() {
         for (i = 0; i < this.collapseTogglers.length; i++) {
             let toggler = this.collapseTogglers[i];
             toggler.addEventListener("click", (e) => {
-                console.log("Click Events");
                 this.toggleCollapse(e.target);
             });
         }
@@ -212,7 +224,8 @@ let Collapse = function() {
         this.mainTogglers.forEach(toggler => {
 
             toggler.onclick = (e) => {
-                console.log("Header Click")
+                
+                toggler.classList.toggle("active");
                 var mainSection = toggler.nextElementSibling;
                 mainSection.classList.toggle('active');
             }

@@ -26,8 +26,14 @@
      <script src="https://unpkg.com/esri-leaflet-vector@4.0.2/dist/esri-leaflet-vector.js" crossorigin=""></script>
 
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="pdf.css">
 </head>
 <body>
+    <navbar class="navbar">
+        <img src="assets//Logo_MAPPED_Logo_500x500_Trans.png" alt="">
+        <h3>Plan Zone</h3>
+    </navbar>
+
     <div class="main-container" id="map-container">
         <div class="spinner-container d-none" id="spinner-container">
             <div class="spinner"></div>
@@ -111,6 +117,15 @@
                             </span>
                         </div>
                         <div class="collapse-section" id="planning-layers" style="max-height: 0px;">
+                            <div class="style-toggler" id="cadastre-feature">
+                                <div class="range-div">
+                                    <input class="feature-range-slider" type="range" value="0.8" id="cadastre-feature" min="0" max="1" step="0.1" disabled>
+                                </div>
+                                <div class="toggler-title">Cadastre</div>
+                            </div>
+
+                            
+
                             <div class="style-toggler" id="lga-feature">
                                 <div class="range-div">
                                     <input class="feature-range-slider" type="range" value="0" id="lga-feature" min="0" max="1" step="0.1">
@@ -125,12 +140,7 @@
                                 <div class="toggler-title">Suburbs</div>
                             </div>
 
-                            <div class="style-toggler" id="cadastre-feature">
-                                <div class="range-div">
-                                    <input class="feature-range-slider" type="range" value="0.8" id="cadastre-feature" min="0" max="1" step="0.1">
-                                </div>
-                                <div class="toggler-title">Cadastre</div>
-                            </div>
+                            
 
                             <div class="style-toggler" id="state-electoral-feature">
                                 <div class="range-div">
@@ -256,89 +266,7 @@
                 </div>
             </div>
         </div>
-        
-
-        <div class="pdf-div d-none" id="pdf-div">
-            <div class="close-btn" id="close-pdf">
-                <i class="fa fa-times"></i>
-            </div>
-
-            <div class="print-pdf" id="print-pdf">
-                Print <i class="fa fa-file-pdf"></i>
-            </div>
-
-            <div class="pdf-header">
-                <div class="logo-section">
-                    <img src="logo.PNG" alt="">
-                </div>
-
-                <div class="title-section">
-                    <div class="slant-bg"></div>
-                    <div class="text">
-                        <h2>Property Report</h2>
-                        <div class="address" id="report-address">57 MEMORIAL AVENUE LIVERPOOL 217</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="pdf-body">
-                <div class="section-intro">
-                    <div class="mini-map" id="mini-map">
-                        <!-- display the map bg color -->
-                    </div>
-
-                    <div class="map-info" id="map-info">
-                        <div class="section-title">Property Details</div>
-
-                        <div class="section-info">
-                            <div class="item">
-                                <div>Address:</div>
-                                <div id="details-address">57 MEMORIAL AVENUE LIVERPOOL 2170</div>
-                            </div>
-
-                            <div class="item" id="property-info">
-                                <div>Lot/Section/Plan No:</div>
-                                <div id="lot-number">1/-/DP1027804</div>
-                            </div>
-
-                            <div class="item">
-                                <div>Council:</div>
-                                <div id="city-council">LIVERPOOL CITY COUNCIL</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <div class="section-title">
-                        Summary of Planning controls
-                    </div>
-
-                    <div class="section-body">
-                        <div class="section-text">
-                            Planning controls held within the Planning Database are summarised below. The property may be
-                            affected by additional planning controls not outlined in this report. Please contact your council for
-                            more information
-                        </div>
-
-                        <div id="summary-info">
-                            <div id="lot-summary"></div>
-                            <div id="admin-summary"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <div class="section-title">Detailed planning information</div>
-                    <div class="section-sub-title">State Environmental Planning Policies which apply to this property</div>
-                    <div class="section-body" id="detailed-info">
-
-                    </div>
-                </div>
-            </div>
-
-
-        </div>
+    
 
         <div class="legend-container" id="legend-container">
             <div class="legend-header toggler-header">
@@ -348,9 +276,162 @@
                 Legend
             </div>
             <div class="legend-body main-section" id="legend-body">
-                Legend
             </div>
         </div>
+    </div>
+    <div class="pdf-div" id="pdf-div">
+        <div class="close-btn" id="close-pdf">
+            <i class="fa fa-times"></i>
+        </div>
+
+        <div class="print-pdf" id="print-pdf">
+            Print <i class="fa fa-file-pdf"></i>
+        </div>
+
+        <!-- <div class="page-header"></div> -->
+        <div class="page-footer">
+            <div class="footer-content">
+                <div class="footer-icon">
+                    <img src="/assets/Logo_MAPPED_Logo_500x500_Trans.png" alt="" height="50px">
+                </div>
+    
+                <div class="footer-address">
+                    <div>meconemosaic.au</div>
+                    <div>mosaic@mecone.com.au</div>
+                    <div>02 8667 8668</div>
+                </div>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                  <td>
+                    <!--place holder for the fixed-position header-->
+                    <div class="page-header-space"></div>
+                  </td>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr>
+                    <td>
+                        <div class="page page-fixed">
+                            <div class="pdf-header">
+                                <div class="logo-section">
+                                    <img src="/assets/PZ-Trans Black.png" alt="">
+                                </div>
+                            </div>
+        
+                            <div class="title-section">
+                                <div class="text">
+                                    <h2>Property Report</h2>
+                                </div>
+                            </div>
+        
+                            <div class="title-footer">
+                                <div>PREPARED FOR</div>
+                                <div>ALI HAMMOUD</div>
+                                <div>NOVEMBER 2023</div>
+                                <div>MECONEMOSAIC.AU</div>
+                            </div>                   
+                        </div>
+
+                        <div class="page page-fixed">
+                            <h2 class="section-header">Disclaimer and Acknowledgement</h2>    
+                            <div class="page-body">
+                                This is an automated site report. The data and information in this report is intended for planning purposes
+                                only. There are strict data privacy and governance stipulations that pertain to this data. You agree and
+                                acknowledge that, to the extend permitted by law (including the Australian Consumer Law if applicable)
+                                that Mecone: </br>
+            
+                                <ul>
+                                    <li>
+                                        a) Do not represent or warrant that this site report are free from errors or omissions, or that they
+                                        are exhaustive;
+                                    </li>
+                                    <li>
+                                        b) Do not represent, warrant or accept any liability in relation to the availability, reliability or quality
+                                        of the data and information contained herein; and
+                                    </li>
+                
+                                    <li>
+                                        c) Disclaim any warranties, representations or endorsements, express or implied, with regard to
+                                        Mecone or the Data, including all implied warranties of merchantability, ftness for a particular
+                                        purpose, or non-infringement
+                                    </li>
+                                </ul>
+                                    
+                                <div class="page-text">
+                                    Mecone recommends that recipients of this report exercise their own skill and care with respect to their
+                                    use of this report and the data contained herein and that users carefully evaluate the accuracy, currency,
+                                    completeness and relevance of the material relevant to their purposes. This report is not a substitute for
+                                    independent professional advice and recipients should obtain any appropriate professional advice
+                                    relevant to their particular circumstances
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="page page-fixed">
+                            <h2 class="section-header">Contact</h2>    
+                            <div class="page-body">
+                            </div>
+                        </div>
+
+                        <div class="page page-fixed">
+                            <div class="section-header">Property Report</div>
+
+                            <div class="section">
+                                <div class="section-title">Location</div>
+                                <div class="address" id="report-address">57 MEMORIAL AVENUE LIVERPOOL 217</div>
+                            </div>
+                            
+                            <div class="section">
+                                <div class="section-title">Map</div>
+                                <div class="mini-map" id="mini-map">
+                                    <!-- display the map bg color -->
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="page">
+                            <div class="section">
+                                <div class="section-title">
+                                    Lot Information
+                                </div>
+            
+                                <div class="section-body">                
+                                    <div id="summary-info">
+                                        <div id="lot-summary"></div>
+                                        <div id="admin-summary"></div>
+                                    </div>
+                                </div>
+                            </div>
+            
+                            <div class="section">
+                                <div class="section-header">Detailed planning information</div>
+                               
+                                <div class="section-body" id="detailed-info">
+            
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </td>
+                </tr>
+              </tbody>
+          
+              <tfoot>
+                <tr>
+                  <td>
+                    <!--place holder for the fixed-position footer-->
+                    <div class="page-footer-space"></div>
+                  </td>
+                </tr>
+            </tfoot>
+        </table>
     </div>
 
     <!-- CDN Files -->

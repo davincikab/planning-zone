@@ -8,7 +8,7 @@ var map = L.map('map', {
     minZoom:8,
     maxBounds:[[-38.03, 139.965 ], [-27.839, 155.258]],
     zoom: 15,
-    maxZoom:18,
+    maxZoom:22,
     zoomControl:false
 });
 
@@ -81,17 +81,13 @@ let popup = new L.Popup({maxWidth: 1000});
 let marker = L.marker(null);
 
 function onMapClick(e) {
-    console.log(e);
     popup.setLatLng(e.latlng);
     marker.setLatLng(e.latlng).addTo(map);
     pdfModule.setLocation(e.latlng);
 
     // query the boundary features
     queryBoundaryFeatures(e.latlng);
-    
     if(map.drawMode || !layerControl.activeLayer.length) return;
-    
-    console.log(layerControl.activeLayer);
     var BBOX =         map.getBounds()._southWest.lng+","+map.getBounds()._southWest.lat+","+map.getBounds()._northEast.lng+","
     +map.getBounds()._northEast.lat;
 
@@ -105,52 +101,88 @@ function onMapClick(e) {
 
     let { layers, name } = layerControl.activeLayer[0].wmsParams;
     
-    // https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/EPI_Primary_Planning_Layers/MapServer/export?dpi=96&transparent=true&format=png32&layers=show:2&bbox=16822454.782010775,-4003599.0080954228,16825966.10799772,-4001215.1282757157&bboxSR=102100&imageSR=102100&size=735,499&f=image
+    
     // fetch the json data
     let jsonUrl = `${layerControl.activeLayer[0]._url}?service=WMS&VERSION=1.1.1&REQUEST=GetFeatureInfo&layers=${layers}&QUERY_LAYERS=${layers}&STYLES=&BBOX=${BBOX}&FEATURE_COUNT=5&HEIGHT=${HEIGHT}&WIDTH=${WIDTH}&INFO_FORMAT=text/xml&SRS=EPSG%3A4326&X=${X}&Y=${Y}`;
-    console.log(jsonUrl);
+    let {x, y} = L.CRS.EPSG3857.project(e.latlng);
+    let geometry = {"xmin":x - 115,"ymin":y-115,"xmax":x+115, "ymax":y+115, "spatialReference":{"wkid":102100,"latestWkid":3857}}
+    let query = `where=(1=1) AND (1=1)&returnGeometry=true&spatialRel=esriSpatialRelIntersects&geometry=${JSON.stringify(geometry)}&geometryType=esriGeometryEnvelope&inSR=102100&outFields=*&outSR=102100`;
 
     let jsonUrls = layerControl.activeLayer.map(layer => {
         // fix this to handle multiple layer options
         let { layers, name } = layer.wmsParams;
-        return {name, url:`${layer._url}?service=WMS&VERSION=1.1.1&REQUEST=GetFeatureInfo&layers=${layers}&QUERY_LAYERS=${layers}&STYLES=&BBOX=${BBOX}&FEATURE_COUNT=5&HEIGHT=${HEIGHT}&WIDTH=${WIDTH}&INFO_FORMAT=text/xml&SRS=EPSG%3A4326&X=${X}&Y=${Y}`};
-    })
+        if(layer.isProperty) {
+            layers = layers.split(":");
+            return {name, url:`https://mapprod1.environment.nsw.gov.au/arcgis/rest/services/Planning/EPI_Development_Control_Layers/MapServer/${layers[1]}/query?f=geojson&${query}`};
+        }
+
+        return {name, url:`${layer._url}?service=WMS&VERSION=1.1.1&REQUEST=GetFeatureInfo&layers=${layers}&QUERY_LAYERS=${layers}&STYLES=&BBOX=${BBOX}&FEATURE_COUNT=2&HEIGHT=${HEIGHT}&WIDTH=${WIDTH}&INFO_FORMAT=text/xml&SRS=EPSG%3A4326&X=${X}&Y=${Y}`};
+    });
+
+    let xmlUrls = jsonUrls.filter(({url}) => !url.includes('esriSpatialRelIntersects'))
+    let geojsonUrls = jsonUrls.filter(({url}) => url.includes('esriSpatialRelIntersects'))
     
-    let fetchRequests = jsonUrls.map(jsonUrl => jsonUrl.url).map(url => fetch(url, { cors:'no-cors' }));
+    let fetchRequests = xmlUrls.map(jsonUrl => jsonUrl.url).map(url => fetch(url, { cors:'no-cors' }));
+    let exportUrlsRequest = geojsonUrls.map(jsonUrl => jsonUrl.url).map(url => fetch(url, { cors:'cors' }))
+    
     Promise.all(fetchRequests)
     .then(res => Promise.all(res.map(rs =>rs.text())))
     .then(responseString => {
-        console.log(responseString);
-        let popupContent = responseString.map((str,i) => {
-            let targetLayer = jsonUrls[i].name;
+        let xmlProps = responseString.map((str,i) => {
+            let targetLayer = xmlUrls[i].name;
             let jsonData = JSON.parse(xml2json(str));
+            
+            return preprocessXml(jsonData, targetLayer);            
+        }).filter(properties => properties);
 
-            return createPopupContent(jsonData, targetLayer);
-        });
+        Promise.all(exportUrlsRequest)
+        .then(res => Promise.all(res.map(rs =>rs.json())))
+        .then(responseData => {
 
-        popup.setContent(`<div class="popup-content">
-            <div class="popup-body">
-                ${popupContent.join("")}
-            </div>
-        </div>`);
+            let geojsonProps = responseData.map((entry, i) => {
+                let targetLayer = xmlUrls[i].name;
 
-        document.getElementById("planning-info").innerHTML = `<div class="popup-content">
-                ${popupContent.join("")}
-        </div>`;
+                return (entry.features && entry.features.length) ? {...entry.features[0].properties, layerName:targetLayer} : null
+            }).filter(props => props);
 
-        pdfModule.updatePropertyInfo(popupContent.join(""));
-
-        // map.openPopup(popup);
-
-
+            renderPopupContent([...xmlProps, ...geojsonProps])
+        })
+        
     })
     .catch(console.error);
-
-
-    
 }
 
-function createPopupContent(jsonData, name) {
+function renderPopupContent(props) {
+    
+    let popupContent = props.map(dataProp => {
+        let content = createPopupContent(dataProp, dataProp.layerName);
+        return content;
+    });
+
+    // return createPopupContent(jsonData, targetLayer);
+    popup.setContent(`<div class="popup-content">
+        <div class="popup-body">
+            ${popupContent.join("")}
+        </div>
+    </div>`);
+
+    document.getElementById("planning-info").innerHTML = `<div class="popup-content">
+            ${popupContent.join("")}
+    </div>`;
+
+    pdfModule.updatePropertyInfo(popupContent.join(""));
+}
+
+function preprocessXml(jsonData, name) {
+    if(jsonData.elements && jsonData.elements[0] && jsonData.elements[0].elements) {
+        let properties = jsonData.elements[0].elements[0].attributes;
+        
+        return properties ? { ...properties, layerName:name } : null;
+    } else {
+        return null;
+    }
+}
+function createPopupContent(properties, name) {
     // / return;
     let cols = [
         'OBJECTID', 'PUBLISHED_DATE', 'COMMENCED_DATE', 'CURRENCY_DATE', 'AMENDMENT', 'MAP_TYPE', 'MAP_NAME', 'LAY_NAME', 'EPI_TYPE',
@@ -158,47 +190,37 @@ function createPopupContent(jsonData, name) {
         'controllingauthorityoid', 'planoid','startdate', 'enddate', 'lastupdate', 'msoid', 'centroidid', 'shapeuuid'
     ];
 
-    console.log(jsonData);
     let content = "", title=name;
-    if(jsonData.elements && jsonData.elements[0] && jsonData.elements[0].elements) {
-        let properties = jsonData.elements[0].elements[0].attributes;
+    
+    let keys = Object.keys(properties);
+    let rows = keys.filter(key => cols.indexOf(key) == -1).map(key => {
+        return `<tr>
+            <td class="keys">${key}</td>
+            <td>${properties[key]}</td>
+        </tr>`
+    });
 
-        if(!properties) {
-            content = " <div>No Feature Found !</div>"
-        } else {
-            let keys = Object.keys(properties);
-            console.log(keys);
-
-            let rows = keys.filter(key => cols.indexOf(key) == -1).map(key => {
-                return `<tr>
-                    <td class="keys">${key}</td>
-                    <td>${properties[key]}</td>
-                </tr>`
-            });
-
-            title = properties.MAP_TYPE ? `${properties.MAP_NAME}: ${properties.LAY_NAME}` : name;
-            content =  `
-                <table>
-                    <tr>
-                        <th></th>
-                        <th></th>
-                    </tr>
-                    <tbody>
-                        ${rows.join("")}
-                    </tbody>
-                </table>
-            `;
-        }
-    } else {
-        content = " <div>No Feature Found !</div>"
-    }
+    title = properties.MAP_TYPE ? `${properties.MAP_NAME}: ${properties.LAY_NAME}` : name;
+    content =  `
+        <table>
+            <tr>
+                <th></th>
+                <th></th>
+            </tr>
+            <tbody>
+                ${rows.join("")}
+            </tbody>
+        </table>
+    `;
+       
     
     return `<div class="popup-info">
         <div class="popup-header">${title}</div>
         <div class="popup-items">
             ${content}
         </div>
-    </div>`
+    </div>`;
+
 }
 
 
@@ -229,6 +251,10 @@ const contoursLayer = L.esri
   url: "https://portal.spatial.nsw.gov.au/server/rest/services/NSW_Elevation_and_Depth_Theme_multiCRS/FeatureServer/2",
   onEachFeature:function(ft, layer) {
     layer.setStyle({ color: "orange", opacity:1, weight: 1, dashArray:null, stroke: true });
+    layer.on("click", (e) => {
+        console.log(ft);
+    });
+
   },
   style: function (feature) {
     let c;
@@ -251,7 +277,7 @@ const contoursLayer = L.esri
 });
 
 contoursLayer.on("click", function (e) {
-    console.log(e.layer);
+    console.log(e.target.layers);
 });
 
 let addressLayer = L.esri
@@ -288,16 +314,16 @@ let easementLayer = L.esri
   url: "https://portal.spatial.nsw.gov.au/server/rest/services/NSW_Land_Parcel_Property_Theme_multiCRS/FeatureServer/9"
 });
 
-addressLayer.on("click", function(e) {
-    console.log(e);
-    // e.originalEvent.stopPropagation();    
-    // renderPopup(e, "Property Layer");
-});
+// addressLayer.on("click", function(e) {
+//     console.log(e);
+//     // e.originalEvent.stopPropagation();    
+//     // renderPopup(e, "Property Layer");
+// });
 
-easementLayer.on("click", function(e) {
-    e.stopPropagation();    
-    renderPopup(e, "Easement");
-})
+// easementLayer.on("click", function(e) {
+//     e.stopPropagation();    
+//     renderPopup(e, "Easement");
+// })
 
 function renderPopup(e, layerName) {
     let properties = e.layer.feature.properties
@@ -360,6 +386,7 @@ const cadastreStyle = {
     fillOpacity:0,
     opacity:0.8,
     color:'teal',
+    // color:"#f87217",
     dashArray: null,
     weight: 1
 };
@@ -367,12 +394,11 @@ const cadastreStyle = {
 
 const cadastreFeature = L.esri
 .featureLayer({
-    // url:"https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Common/Admin_3857/MapServer/12",
     url: "https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Common/AddressSearch/MapServer/0",
     onEachFeature:function(feature, layer) {
         layer.on("click",(e) => {
             console.log(e.target);
-            updateLotDetails(e, feature.properties);
+            updateLotDetails(e, feature);
 
             if(selectedLayer) {
                 selectedLayer.setStyle({
@@ -388,7 +414,7 @@ const cadastreFeature = L.esri
             selectedLayer = e.target;
 
             selectedLayer.setStyle({
-                color:'#29CC2D',
+                color:'#f87217',
                 weight:2.5,
                 fillColor:'transparent'
             });
@@ -400,7 +426,7 @@ const cadastreFeature = L.esri
             console.log('mouseover');
             if(e.target == selectedLayer) {
                 layer.setStyle({
-                    color:'#29CC2D',
+                    color:'#f87217',
                     weight:2.5,
                     fillColor:'#ddd'
                 });
@@ -517,7 +543,7 @@ document.querySelectorAll(".feature-slider").forEach(featureSlider => {
 
 function toggleFeature(layer, isChecked) {
     if(isChecked) {
-        layer.addTo(map);
+        layer.addTo(map).bringToBack();
     } else {
         layer.remove();
     }
@@ -547,7 +573,10 @@ map.on("zoomend", (e) => {
     }
 })
 
-function updateLotDetails(e, properties) {
+function updateLotDetails(e, feature) {
+    let { properties } = feature;
+    let areaM = turf.area(feature);
+    console.log(areaM);
     // console.log(properties);
     let coords = Object.values(e.latlng).reverse();
     document.getElementById("info-container").classList.remove("d-none");
@@ -555,11 +584,8 @@ function updateLotDetails(e, properties) {
     addressLayer.query()
     .intersects({"type":"Point", "coordinates":[...coords]})
     .run((err, fc) => { 
-        console.log(fc);
         if(fc.features.length) {
             let address = createAddressFromProperties(fc.features[0].properties);
-            console.log(address);
-
             document.getElementById("address-value").innerHTML = address;
 
             pdfModule.setLocation(e.latlng);
@@ -571,7 +597,32 @@ function updateLotDetails(e, properties) {
 
     });
 
-    console.log(e);
+    // contour layer
+    let buffer = turf.buffer({"type":"Point", "coordinates":[...coords]}, 0.002)
+    contoursLayer.query()
+    .intersects(buffer)
+    .run((err, fc) => { 
+
+        if(fc.features.length) {
+            document.getElementById("elevation-value").innerHTML = `${fc.features[0].properties.elevation} m`;
+        }
+    });
+    
+    // easement layer
+    easementLayer.query()
+    .intersects({"type":"Point", "coordinates":[...coords]})
+    .run((err, fc) => { 
+        console.log("Fc Collection");
+        console.log(fc);
+        if(fc.features.length) {
+            let { properties } = fc.features[0].properties;
+
+            document.getElementById("lot-info-section").innerHTML += `<div class="info-click-feature-attribute">
+                <div class="info-click-feature-attribute-name">Easement Type:</div>
+                <div class="info-click-feature-attribute-value">${properties['easementtype']}</div>
+            </div>`;
+        }
+    });
 
     if(!properties) {
         document.getElementById("lot-info").classList.add("d-none");
@@ -581,11 +632,12 @@ function updateLotDetails(e, properties) {
     document.getElementById("lot-info").classList.remove("d-none");
 
     let title = ["LOTNUMBER", "SECTIONNUMBER", "PLANLABEL"].map(key => properties[key]).filter(val=> val).join("/");
-    let areaHa = properties['Area_H'].toFixed(3);
+    let areaHa = (properties['Area_H'] * 10000).toFixed(0);
+    console.log(properties);
 
     let lotDetails = `<div class="info-click-feature-attribute">
         <div class="info-click-feature-attribute-name">Total Lot Area(Appox):</div>
-        <div class="info-click-feature-attribute-value">${areaHa}ha</div>
+        <div class="info-click-feature-attribute-value">${areaHa} M<sup>2</sup></div>
     </div>
 
     <div class="info-click-feature-attribute">
@@ -605,10 +657,16 @@ function updateLotDetails(e, properties) {
 
     <div class="info-click-feature-attribute">
         <div class="info-click-feature-attribute-name">Lot Area(Appox)::</div>
-        <div class="info-click-feature-attribute-value">${areaHa}ha</div>
-    </div>`;
+        <div class="info-click-feature-attribute-value">${areaHa} M<sup>2</sup></div>
+    </div>
 
-    document.getElementById("lot-number").innerHTML = title;
+    <div class="info-click-feature-attribute">
+        <div class="info-click-feature-attribute-name">Elevation:</div>
+        <div class="info-click-feature-attribute-value" id="elevation-value"></div>
+    </div>
+    `;
+
+    // document.getElementById("lot-number").innerHTML = title;
     document.getElementById("lot-info-section").innerHTML = lotDetails;
 }
 
@@ -727,7 +785,7 @@ function renderWMSLayer({ link, layer}) {
     
 }
 
-L.control.scale().addTo(map);
+L.control.scale({metric:true, imperial:false}).addTo(map);
 
 // Custom Control Button
 L.easyButton('fa-layer-group', function(btn, map) {
@@ -745,7 +803,8 @@ L.easyButton('fa-file-pdf', function(btn, map){
         alert("Kindly Click on a Property");
         return;
     }
-
+    
+    map.setView(pdfModule.location);
     pdfModule.handlePrintAction();
 }).addTo( map );
 
@@ -756,6 +815,10 @@ L.easyButton('fa-print', function(btn, map){
 
 L.easyButton('fa-expand', function(btn, map){
     toggleFullscreen();
+}).addTo( map );
+
+L.easyButton('fa-person', function(btn, map){
+    toggleStreetView();
 }).addTo( map );
 
 let isLightMode = true;
@@ -783,6 +846,13 @@ function toggleFullscreen() {
     } else {
       document.exitFullscreen();
     }
+}
+
+
+function toggleStreetView() {
+    let addressCoordinates  = map.getCenter();
+    window.location.assign(`https://maps.googleapis.com/maps/api/streetview?size=400x400&location=47.5763831,-122.4211769
+    &fov=80&heading=70&pitch=0&key=YOUR_API_KEY&signature=YOUR_SIGNATURE`)
 }
 
 

@@ -5,12 +5,27 @@ body {
 
 .main-container {
     position: relative;
+    width: 100vw;
+    overflow-x: hidden;
+}
+
+.navbar {
+    height: 80px;
+    display: flex;
+    width: 100%;
+    align-items: center;
+}
+
+.navbar img {
+    height: 50px;
+    margin:10px;
 }
 
 #map {
     width: 100vw;
-    height: 100vh;
+    height: calc(100vh - 100px);
     cursor: pointer;
+    z-index: 0;
 }
 
 :root  {
@@ -34,6 +49,14 @@ body {
     font-size: 1.2rem;
     padding: 0.5rem 0.75rem;
     cursor: pointer;
+}
+
+.toggler-header  > * {
+    pointer-events: none;
+}
+
+.toggler-header.active span {
+    transform: rotate(90deg);
 }
 
 .toggler-header > span {
@@ -234,12 +257,6 @@ body {
     outline:none;
 }
 
-#map { 
-    height: 100vh;
-    width: 100vw;
-    z-index: 0;
-}
-
 .mapboxgl-ctrl-geocoder {
     /* box-shadow: 0px 0px 0.1rem var(--light); */
     border-radius:5px;
@@ -300,9 +317,9 @@ body {
 }
 
 .legend-item img {
-    width: 220px;
+    /* width: 220px; */
     max-height: 600px;
-    object-fit: contain;
+    /* object-fit: contain; */
 }
 
 .leaflet-container {
@@ -558,6 +575,10 @@ td.keys {
     pointer-events: none;
 }
 
+.pdf-div  .close-btn {
+    color:var(--black);
+}
+
 .print-pdf {
     position: absolute;
     top:0px;
@@ -566,140 +587,14 @@ td.keys {
     color:var(--primary);
     background-color: var(--white);
     padding:0.5rem 0.75rem;
-    box-shadow: 0px 0px 0.25rem #ddd;
+    box-shadow: 0px 0px 0.25rem #848484;
     border-radius: 5px;
     cursor:  pointer;
+    z-index: 2;
 }
 
 .print-pdf:hover {
     border:1px solid var(--black)
-}
-
-/* PDF DIV */
-.pdf-div {
-    position: absolute;
-    z-index: 3;
-    top: 5%;
-    left: 10%;
-    height: 90vh;
-    overflow-y: auto;
-    width: 80%;
-    margin: 0 auto;
-    background-color: white;
-    box-shadow: 0px 0px 0.5rem #000;
-}
-
-.pdf-div .pdf-header {
-    display: flex;
-    background-color: white;
-}
-
-.pdf-div .pdf-header img {
-    height: 150px;
-}
-
-.pdf-div .title-section {
-    background-color: var(--primary);
-    flex:1;
-    display: flex;
-    overflow: hidden;
-}
-
-.pdf-body {
-    margin-bottom: 1.5rem;
-    font-size: 15px;
-}
-
-.title-section .slant-bg {
-    background-color: white;
-    width: 100px;
-    height: 150%;
-
-    transform: rotate(10deg);
-    margin-left: -50px;
-    margin-top: -50px;
-}
-
-.title-section .text {
-    padding-left: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    margin-left: 1rem;
-    margin-bottom: 1rem;
-}
-
-.title-section h2 {
-    color:white;
-    font-size: 2.5rem;
-    margin:0 0 0.25rem;
-}
-
-.title-section .address {
-    color:var(--white);
-    font: 1.5rem;
-    font-style: normal;
-}
-
-.section-intro {
-    display: flex;
-    padding:0 3rem;
-    margin-top: 2rem;
-}
-
-.mini-map {
-    height: 250px;
-    overflow: hidden;
-    /* background-color: var(--primary); */
-    flex: 1;
-}
-
-.mini-map #map {
-    width: 100%;
-    height: 100%;
-}
-
-.mini-map img {
-    object-fit: cover;
-    width: 100%;
-    height: 350px;
-}
-
-.section-intro .map-info {
-    padding-left: 2rem;
-    flex:1;
-}
-
-.section-info .item {
-    display: flex;
-    margin:0.5rem 0;
-    justify-content: space-between;
-    
-}
-
-.section-info .item div:last-child {
-    font-size:13px;
-}
-
-.section-info .item div:first-child {
-    /* width: 120px; */
-    margin-right: 1rem;
-}
-
-/* Other Sections */
-.section {
-    padding: 1rem 3rem 0;
-}
-
-.section .section-title, .section-title {
-    color:var(--primary);
-    font-size: 1.25rem;
-    margin:0.5rem 0 1rem;
-    font-weight: 600;
-}
-
-.section .section-subtitle {
-    color:var(--black);
 }
 
 /*  */
