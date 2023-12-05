@@ -35,6 +35,15 @@ let PdfModule = function(map) {
 
         this.downloadButton.onclick = () => this.downloadImage();
 
+        this.renderMap();
+    }
+
+    this.renderMap = () => {
+        if(this.minimap) {
+            this.minimap.remove();
+        }
+
+
         this.minimap = L.map('mini-map', {
             center:{lat: -33.68953, lng: 150.60774},
             maxBounds:[[-38.03, 139.965 ], [-27.839, 155.258]],
@@ -51,20 +60,30 @@ let PdfModule = function(map) {
             minZoom: 0,
             opacity:1
         }).addTo(this.minimap);
-        
-        this.cadastreFeature = L.esri
-            .featureLayer({
-                url: "https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Common/AddressSearch/MapServer/0",
-                style:function(feature) {
-                    return {...cadastreStyle}
-                }
-            }).addTo(this.minimap);
-
-
     }
 
-    this.toggleBasemap = () => {
+    this.updateSelectedProperty = (feature) => {
+        this.renderMap();
 
+        if(this.propertyPolygon) {
+            this.propertyPolygon.remove();
+        }
+
+        console.log(feature);
+
+        let polygonGeo = {"type":"FeatureCollection", "features":[feature]};
+        this.propertyPolygon = L.geoJSON(polygonGeo, {
+            style:function(ft) {
+                return {
+                    color:'#f87217',
+                    weight:2.5,
+                    fillColor:'transparent'
+                }
+            }
+        }).addTo(this.minimap);
+
+
+        this.minimap.fitBounds(this.propertyPolygon.getBounds(), { padding:L.point(30,30)});
     }
     
     this.updateSource = (sourceId) => {
@@ -90,6 +109,15 @@ let PdfModule = function(map) {
 
     this.setLocation = (center) => {
         this.location = center;
+    }
+
+    this.renderLocationMarker = () => {
+        if(this.locationMarker) {
+            this.locationMarker.remove();
+        }
+
+
+        this.locationMarker = L.marker(this.location).addTo(this.minimap);
     }
 
     this.getLocationAddress = () => {
@@ -156,11 +184,15 @@ let PdfModule = function(map) {
         this.spinnerContainer.classList.remove("d-none");
         document.getElementById("spinner-info").innerHTML = "Processing PDF...";
 
+        this.renderMap();
         setTimeout(() => {
             pdfModule.minimap.setView(pdfModule.location);
             this.togglePDFView();
             this.spinnerContainer.classList.add("d-none");
             document.querySelector("body").classList.add("printing");
+
+            this.updateSelectedProperty(this.targetFeature);
+            this.renderLocationMarker();
             // domtoimage.toPng(document.querySelector("#map"), {quality:0.45})
             // .then((dataUrl) => {
             //     var img = new Image();
@@ -192,6 +224,8 @@ let PdfModule = function(map) {
             //         this.togglePDFView();
             //         this.spinnerContainer.classList.add("d-none");
             // });
+
+            // this.cadastreFeature.query
         }, 100);
 
         // this.getLocationAddress();

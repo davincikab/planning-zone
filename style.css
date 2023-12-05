@@ -83,14 +83,15 @@ body {
 
 .layers-container .main-section.active {
     height: fit-content;
-    max-height: 80vh;
+    max-height: 75vh;
 }
 
 .sub-section {
-    max-height: 80vh;
+    max-height: 70vh;
     overflow-y: auto;
     overflow-x: hidden;
     padding: 0.5rem;
+    font-size: 0.8rem;
 }
 
 .info-container {
@@ -171,6 +172,7 @@ body {
     /* width: 38vw; */
     width:350px;
     height: auto;
+   
     border-radius: 5px;
     box-shadow: 0px 0px 0.25rem #999;
 }
@@ -352,10 +354,11 @@ body {
     box-shadow: 0px 0px 0.25rem #7f7d7d;
 }
 
-.leaflet-control-zoom a {
+/* .leaflet-control-zoom a {
     background-color: rgba(0, 0, 0, 0.7);
     color:white;
-}
+} */
+
 .leaflet-control-zoom a:hover {
     background-color: #000000c3;
     color:white;

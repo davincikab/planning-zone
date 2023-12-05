@@ -170,6 +170,17 @@
 
                     </div>
 
+                    <div class="feature-layers">
+                        <div class="collapse-toggler">
+                            <div class="toggler-title">Historical Imagery</div>
+                            <span>
+                                <i class="fa fa-angle-down"></i>
+                            </span>
+                        </div>
+
+                        <div class="collapse-section" id="historical-imagery"></div>
+                    </div>
+
                     <div class="custom-feature-layer">
 
                         <div class="feature-toggler">
@@ -189,6 +200,43 @@
 
                             <div class="toggler-title">Easement</div>
                         </div>
+
+                        <div class="feature-toggler">
+                            <label class="switch" id="Liverpool-DCP">
+                                <input class="feature-slider" type="checkbox" id="Liverpool-DCP" />
+                                <span class="slider round"></span>
+                            </label>
+
+                            <div class="toggler-title">Liverpool DCP</div>
+                        </div>
+                        <div class="feature-toggler">
+                            <label class="switch" id="NSW-Roads">
+                                <input class="feature-slider" type="checkbox" id="NSW-Roads" />
+                                <span class="slider round"></span>
+                            </label>
+
+                            <div class="toggler-title">NSW Roads</div>
+                        </div>
+
+                        <div class="feature-toggler">
+                            <label class="switch" id="Australia-ilproads">
+                                <input class="feature-slider" type="checkbox" id="Australia-ilproads" />
+                                <span class="slider round"></span>
+                            </label>
+
+                            <div class="toggler-title">Australia ILP Roads</div>
+                        </div>
+
+                        <div class="feature-toggler">
+                            <label class="switch" id="NSW-Imagery">
+                                <input class="feature-slider" type="checkbox" id="NSW-Imagery" />
+                                <span class="slider round"></span>
+                            </label>
+
+                            <div class="toggler-title">NSW Imagery</div>
+                        </div>
+
+                        
                         
                     </div>
     
@@ -279,7 +327,7 @@
             </div>
         </div>
     </div>
-    <div class="pdf-div" id="pdf-div">
+    <div class="pdf-div d-none" id="pdf-div">
         <div class="close-btn" id="close-pdf">
             <i class="fa fa-times"></i>
         </div>
@@ -329,7 +377,7 @@
                                 </div>
                             </div>
         
-                            <div class="title-footer">
+                            <div class="title-footer d-none">
                                 <div>PREPARED FOR</div>
                                 <div>ALI HAMMOUD</div>
                                 <div>NOVEMBER 2023</div>
@@ -494,7 +542,10 @@
     <script src="layers.js"></script>
     <script src="layer-control.js"></script>
     <script src="measure-module.js"></script>
+    <script src="data-columns.js"></script>
+    <script src="featureLayerStyles.js"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-ajax@2.1.0/dist/leaflet.ajax.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xml-js@1.6.11/dist/xml-js.min.js"></script>
     <script src="main.js"></script>
 

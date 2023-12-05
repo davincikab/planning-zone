@@ -110,13 +110,13 @@ function onMapClick(e) {
 
     let jsonUrls = layerControl.activeLayer.map(layer => {
         // fix this to handle multiple layer options
-        let { layers, name } = layer.wmsParams;
+        let { layers, name, layerId } = layer.wmsParams;
         if(layer.isProperty) {
             layers = layers.split(":");
-            return {name, url:`https://mapprod1.environment.nsw.gov.au/arcgis/rest/services/Planning/EPI_Development_Control_Layers/MapServer/${layers[1]}/query?f=geojson&${query}`};
+            return {name, id:layerId, url:`https://mapprod1.environment.nsw.gov.au/arcgis/rest/services/Planning/EPI_Development_Control_Layers/MapServer/${layers[1]}/query?f=geojson&${query}`};
         }
 
-        return {name, url:`${layer._url}?service=WMS&VERSION=1.1.1&REQUEST=GetFeatureInfo&layers=${layers}&QUERY_LAYERS=${layers}&STYLES=&BBOX=${BBOX}&FEATURE_COUNT=2&HEIGHT=${HEIGHT}&WIDTH=${WIDTH}&INFO_FORMAT=text/xml&SRS=EPSG%3A4326&X=${X}&Y=${Y}`};
+        return {name, id:layerId, url:`${layer._url}?service=WMS&VERSION=1.1.1&REQUEST=GetFeatureInfo&layers=${layers}&QUERY_LAYERS=${layers}&STYLES=&BBOX=${BBOX}&FEATURE_COUNT=2&HEIGHT=${HEIGHT}&WIDTH=${WIDTH}&INFO_FORMAT=text/xml&SRS=EPSG%3A4326&X=${X}&Y=${Y}`};
     });
 
     let xmlUrls = jsonUrls.filter(({url}) => !url.includes('esriSpatialRelIntersects'))
@@ -129,10 +129,10 @@ function onMapClick(e) {
     .then(res => Promise.all(res.map(rs =>rs.text())))
     .then(responseString => {
         let xmlProps = responseString.map((str,i) => {
-            let targetLayer = xmlUrls[i].name;
             let jsonData = JSON.parse(xml2json(str));
+            let {name, id} = xmlUrls[i];
             
-            return preprocessXml(jsonData, targetLayer);            
+            return preprocessXml(jsonData, name, id);            
         }).filter(properties => properties);
 
         Promise.all(exportUrlsRequest)
@@ -140,9 +140,9 @@ function onMapClick(e) {
         .then(responseData => {
 
             let geojsonProps = responseData.map((entry, i) => {
-                let targetLayer = xmlUrls[i].name;
+                let {name, id} = xmlUrls[i];
 
-                return (entry.features && entry.features.length) ? {...entry.features[0].properties, layerName:targetLayer} : null
+                return (entry.features && entry.features.length) ? {...entry.features[0].properties, id:name, id} : null
             }).filter(props => props);
 
             renderPopupContent([...xmlProps, ...geojsonProps])
@@ -173,11 +173,11 @@ function renderPopupContent(props) {
     pdfModule.updatePropertyInfo(popupContent.join(""));
 }
 
-function preprocessXml(jsonData, name) {
+function preprocessXml(jsonData, name, id) {
     if(jsonData.elements && jsonData.elements[0] && jsonData.elements[0].elements) {
         let properties = jsonData.elements[0].elements[0].attributes;
         
-        return properties ? { ...properties, layerName:name } : null;
+        return properties ? { ...properties, layerName:name, id } : null;
     } else {
         return null;
     }
@@ -186,16 +186,18 @@ function createPopupContent(properties, name) {
     // / return;
     let cols = [
         'OBJECTID', 'PUBLISHED_DATE', 'COMMENCED_DATE', 'CURRENCY_DATE', 'AMENDMENT', 'MAP_TYPE', 'MAP_NAME', 'LAY_NAME', 'EPI_TYPE',
-        'msoid', 'cadid', 'createdate', 'modifieddate','Shape', 'shape_Length', 'shape_Area','Shapeuuid',
+        'msoid', 'cadid', 'createdate', 'modifieddate','Shape', 'shape_Length', 'shape_Area','Shapeuuid','id', 'layerName',
         'controllingauthorityoid', 'planoid','startdate', 'enddate', 'lastupdate', 'msoid', 'centroidid', 'shapeuuid'
     ];
 
+    let keys = columnValues[properties.id] ?  columnValues[properties.id].columns : Object.keys(properties);
+
+    console.log(properties);
+
     let content = "", title=name;
-    
-    let keys = Object.keys(properties);
     let rows = keys.filter(key => cols.indexOf(key) == -1).map(key => {
         return `<tr>
-            <td class="keys">${key}</td>
+            <td class="keys">${key.replace(/_/, " ").toLocaleLowerCase()}</td>
             <td>${properties[key]}</td>
         </tr>`
     });
@@ -260,16 +262,16 @@ const contoursLayer = L.esri
     let c;
     switch (feature.properties.classsubtype) {
       case 1:
-        c = "#d1aefc";
+        c = "rgba(209, 194, 252, 255)";
         break;
       case 2:
-        c = "#b3fcb4";
+        c = "rgba(179, 252, 180, 255)";
         break;
       case 3:
-        c = "#fcc5b6";
+        c = "rgba(252, 197, 182, 255)";
         break; 
       default:
-        c = "#FF0800";
+        c = "#000";
     }
 
     return { color: c, opacity:1, weight: 1, dashArray:null, stroke: true};
@@ -311,7 +313,15 @@ let addressLayer = L.esri
 // Easements
 let easementLayer = L.esri
 .featureLayer({
-  url: "https://portal.spatial.nsw.gov.au/server/rest/services/NSW_Land_Parcel_Property_Theme_multiCRS/FeatureServer/9"
+  url: "https://portal.spatial.nsw.gov.au/server/rest/services/NSW_Land_Parcel_Property_Theme_multiCRS/FeatureServer/9",
+  style:function(feature) {
+    return {
+        color:'rgba(255, 190, 232, 255)',
+        weight:3,
+        fillOpacity:1,
+        fillColor:'rgba(0, 0, 0, 0)'
+    }
+  }
 });
 
 // addressLayer.on("click", function(e) {
@@ -342,7 +352,7 @@ function renderPopup(e, layerName) {
 
     popup.setContent(`
         <div class="popup-content">
-            <div class="popup-header">${layerName} ${properties['msoid']}</div>
+            <div class="popup-header">${layerName}</div>
             <div class="popup-body">
                 <table>
                     <tr>
@@ -360,9 +370,157 @@ function renderPopup(e, layerName) {
     popup.setLatLng(e.latlng).addTo(map);
 }
 
+// liverpool
+let liverpoolDcp = L.esri
+    .featureLayer({
+        url:"https://services6.arcgis.com/Ys4U0NCXGgyTtRWx/arcgis/rest/services/LCC_DCP_road_network/FeatureServer/0",
+        style:function(feature) {
+            let styleEntry = liverpoolDcpStyle.find(lvp => lvp.label == feature.properties['ROAD_CLASS']);
+
+            let fillColor  = styleEntry ? `rgba(${styleEntry.fillColor})` : "#999";
+            let color = styleEntry ? `rgba(${styleEntry.color})` : "#000";
+
+            return {
+                fillColor:fillColor,
+                fillOpacity:0.8,
+                weight:0.35,
+                color:color
+            }
+        }
+    });
+
+let nswRoads = L.esri
+    .featureLayer({
+        url:"https://portal.spatial.nsw.gov.au/server/rest/services/NSW_Transport_Theme/FeatureServer/5",
+        style:function(feature) {
+
+            return {
+                weight:1.5,
+                color:"rgba(163, 142, 81, 255)"
+            }
+        }
+    });
+
+// nswRoads.addTo(map);
+
+let australIlpRoads =  L.geoJSON(null, {
+    style:function(feature) {
+        let styleEntry = liverpoolDcpStyle.find(lvp => lvp.label == feature.properties['ROAD_CLASS'].trim());
+
+        let fillColor  = `rgba(${styleEntry.fillColor})`;
+        let color = `rgba(${styleEntry.color})`;
+        // console.log(feature);
+
+        return {
+            fillColor:fillColor,
+            fillOpacity:0.8,
+            weight:0.5,
+            color:color
+        }
+    }
+});
+
+australIlpRoads.addTo(map);
+
+fetch("data/DCP_StreetNetwork.geojson")
+.then(res=> res.json())
+.then(data => {
+    console.log(data);
+    australIlpRoads.addData(data);
+})
+.catch(console.error);
+// leppington
+// https://basemaps.arcgis.com/arcgis/rest/services/World_Basemap_v2/VectorTileServer/tile/14/9837/15054.pbf
+// let leppington = L.esri.Vector.vectorTileLayer(
+//     "https://services.arcgisonline.com/arcgis/rest/services/Elevation/World_Hillshade/MapServer"
+// );
+
+// leppington.addTo(map);
+
+
+// nsw imagery: 
+let imageryUrl = "https://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Imagery/MapServer"
+let nswImagery = L.esri.tiledMapLayer({
+    url: imageryUrl,
+    opacity: 0.75,
+    useCors: false
+});
+
+// Historical Images layer Group
+let HistoricalImageryUrl = {
+    "1998":"https://portal.spatial.nsw.gov.au/tileservices/Hosted/HistoricalImagery1998/MapServer",
+    "1994":"https://portal.spatial.nsw.gov.au/tileservices/Hosted/HistoricalImagery1994/MapServer",
+    "1991":"https://portal.spatial.nsw.gov.au/tileservices/Hosted/HistoricalImagery1991/MapServer",
+    "1986":"https://portal.spatial.nsw.gov.au/tileservices/Hosted/HistoricalImagery1986/MapServer",
+    "1984":"https://portal.spatial.nsw.gov.au/tileservices/Hosted/HistoricalImagery1984/MapServer",
+    "1975":"https://portal.spatial.nsw.gov.au/tileservices/Hosted/HistoricalImagery1975/MapServer",
+    "1966":"https://portal.spatial.nsw.gov.au/tileservices/Hosted/HistoricalImagery1966/MapServer",
+    "1965":"https://portal.spatial.nsw.gov.au/tileservices/Hosted/HistoricalImagery1965/MapServer",
+    "1955":"https://portal.spatial.nsw.gov.au/tileservices/Hosted/HistoricalImagery1955/MapServer",
+    "1947":"https://portal.spatial.nsw.gov.au/tileservices/Hosted/HistoricalImagery1947/MapServer",
+    "1943":"https://portal.spatial.nsw.gov.au/tileservices/Hosted/HistoricalImagery1943/MapServer"
+};
+
+let tiledFeatureLayers = {};
+Object.keys(HistoricalImageryUrl).forEach(key => {
+    let id = `historical-image-${key}`;
+    let url = HistoricalImageryUrl[key];
+
+    let tlLayer = L.esri.tiledMapLayer({
+        url: url,
+        opacity: 0.75,
+        useCors: false
+    });
+
+    tiledFeatureLayers[id] = tlLayer;
+});
+
+let historyImagery = L.esri.tiledMapLayer({
+    url: "https://portal.spatial.nsw.gov.au/tileservices/Hosted/HistoricalImagery1998/MapServer",
+    opacity: 0.75,
+    // only necessary for old versions of ArcGIS Server
+    useCors: false
+});
+
+let imageryDivs = Object.keys(HistoricalImageryUrl).map(key => {
+    let id = `historical-image-${key}`;
+
+    return `<div class="style-toggler" id="${id}">
+        <div class="range-div">
+            <input class="features-slider" type="range" id="${id}" min="0" value="0.0" max="1" step="0.1">
+        </div>
+        <div class="toggler-title">Historical Imagery ${key}</div>
+    </div>`;
+});
+
+document.getElementById("historical-imagery").innerHTML = imageryDivs.join("");
+document.querySelectorAll(".features-slider").forEach(sliderItem => {
+    sliderItem.oninput = (e) => {
+        let {id, value } = e.target;
+        togglerFeatureLayers(id, value);
+    }
+
+});
+
+function togglerFeatureLayers(id, value) {
+    let layer = tiledFeatureLayers[id];
+    layer.setOpacity(value);
+
+    if(value == 0) {
+        layer.remove();
+    } else {
+        layer.addTo(map);
+    }
+}
+// .addTo(map);
+
 let featureLayers = {
     'contours':contoursLayer,
-    'easements':easementLayer
+    'easements':easementLayer,
+    'Liverpool-DCP':liverpoolDcp,
+    'NSW-Roads':nswRoads,
+    'Australia-ilproads':australIlpRoads,
+    'NSW-Imagery':nswImagery
 };
 
 const lgaStyle = {
@@ -577,6 +735,9 @@ function updateLotDetails(e, feature) {
     let { properties } = feature;
     let areaM = turf.area(feature);
     console.log(areaM);
+
+    pdfModule.targetFeature = feature;
+    // pdfModule
     // console.log(properties);
     let coords = Object.values(e.latlng).reverse();
     document.getElementById("info-container").classList.remove("d-none");
@@ -603,7 +764,7 @@ function updateLotDetails(e, feature) {
     .intersects(buffer)
     .run((err, fc) => { 
 
-        if(fc.features.length) {
+        if(fc && fc.features.length) {
             document.getElementById("elevation-value").innerHTML = `${fc.features[0].properties.elevation} m`;
         }
     });
@@ -614,13 +775,18 @@ function updateLotDetails(e, feature) {
     .run((err, fc) => { 
         console.log("Fc Collection");
         console.log(fc);
-        if(fc.features.length) {
+        if(fc && fc.features.length) {
             let { properties } = fc.features[0].properties;
 
             document.getElementById("lot-info-section").innerHTML += `<div class="info-click-feature-attribute">
                 <div class="info-click-feature-attribute-name">Easement Type:</div>
                 <div class="info-click-feature-attribute-value">${properties['easementtype']}</div>
-            </div>`;
+            </div>
+            <div class="info-click-feature-attribute">
+                <div class="info-click-feature-attribute-name">Easement Width:</div>
+                <div class="info-click-feature-attribute-value">${properties['easementwidth']}</div>
+            </div>
+            `;
         }
     });
 
@@ -850,9 +1016,32 @@ function toggleFullscreen() {
 
 
 function toggleStreetView() {
-    let addressCoordinates  = map.getCenter();
-    window.location.assign(`https://maps.googleapis.com/maps/api/streetview?size=400x400&location=47.5763831,-122.4211769
-    &fov=80&heading=70&pitch=0&key=YOUR_API_KEY&signature=YOUR_SIGNATURE`)
+    let propertyCoord;
+    if(!pdfModule.location) {
+        propertyCoord  = Object.values(map.getCenter());
+    } else {
+        propertyCoord = Object.values(pdfModule.location);
+    }
+    
+    let url = `https://maps.googleapis.com/maps/api/streetview/metadata?location=${propertyCoord}&source=outdoor&key=AIzaSyDGmlpKi5ZYw3Q-vgKDkDv5Io0cnljwhi4`;
+    console.log(url);
+    fetch(url)
+    .then(res => res.json())
+    .then(data => {
+        console.log(data);
+        let { pano_id } = data;
+
+        if(pano_id) {
+            // redirect to street view page
+            let steetViewLink = `https://www.google.com/maps/@?api=1&map_action=pano&pano=${pano_id}`;
+            window.open(steetViewLink, '_blank');
+        } else {
+            alert("No Google Street View Coverage");
+        }
+        
+    })
+    .catch(console.error);
+
 }
 
 
@@ -891,3 +1080,21 @@ function toggleStreetView() {
 //         State: {name: 'Montana', fips: '30'},
 //     }
 // }
+
+// "Easement":["easementtype","easementwidth"],
+// "Contour":["elevation"]
+
+function createLayers(prefixId, layerList) {
+    let groupLayers = layerList.map(layer => {
+        let id = `${prefixId}-${layer.name.split(" ").join("-").toLocaleLowerCase()}`;
+
+        return {
+            "name":layer.name,
+            "id":id,
+            "layerName":layer.id,isVisible:true,opacity:0.01,
+        }
+    })
+
+    return groupLayers;
+    console.log(groupLayers);
+}

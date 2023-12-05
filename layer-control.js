@@ -143,6 +143,10 @@ let LayerControl = function(layers, map) {
 
     }
 
+    this.toggleIsPropertyLegend = (layer) => {
+        
+    }
+
 
     // render the layer on the side tab
     this.renderLayerTogglers = () => {

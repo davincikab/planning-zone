@@ -44,7 +44,8 @@
 }
 
 .page.page-fixed {
-    height: 100vh;
+    min-height: 100vh !important;
+    height: auto;
     border-bottom:5px solid #000;
 }
 
@@ -52,6 +53,7 @@
     font-size: 25px;
     font-weight: 800;
     color:#F87418;
+    margin: 1.5rem 0rem;
 }
 
 .title-section .slant-bg {
@@ -92,7 +94,7 @@
 
 .mini-map {
     height: 70vh;
-    width: 100%;
+    width: 550px;
     overflow: hidden;
 }
 
@@ -160,6 +162,7 @@
     display: table-cell;
     vertical-align: inherit;
     border-bottom: 2px solid teal;
+    padding: 5px;
 }
 
 .page .info-click-feature > div {
@@ -194,7 +197,7 @@
 /* Other Sections */
 .section {
     padding: 0rem 0rem 0;
-    margin-bottom: 1.75rem;
+    margin: 1.5rem 0;
 }
 
 .section .section-title, .section-title {
@@ -316,11 +319,20 @@ td.keys {
     /* .printing .pdf-div  */
   
   @page {
-    margin: 5mm;
+    margin: 10mm 5.5mm;
   }
   
   @media print {
+    .mini-map {
+        height: 70vh;
+        width: 550px;
+        overflow: hidden;
+        margin-left: 5%;
+    }
+    
+    
     .page.page-fixed {
+        min-height: auto;
         height: auto;
         border:none;
     }

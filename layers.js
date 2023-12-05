@@ -677,5 +677,259 @@ let mapLayers = {
     //     ]
     // },
     // 'Contours':{},
-    
+    "SEPP (PCR)":{
+        id:'sepp-pcr',
+        isProperty:true,
+        source:'https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/SEPP_Precincts_Central_River_City_2021/MapServer/export?',
+        layers:[
+            {"name":"Subject Land","id":"sepp-pcr-subject-land","layerName":1,"isVisible":true,"opacity":0.01},
+            {"name":"Land Application","id":"sepp-pcr-land-application","layerName":2,"isVisible":true,"opacity":0.01},
+            {"name":"Floor Space Ratio (n:1)","id":"sepp-pcr-floor-space-ratio-(n:1)","layerName":3,"isVisible":true,"opacity":0.01},
+            {"name":"Land Zoning","id":"sepp-pcr-land-zoning","layerName":4,"isVisible":true,"opacity":0.01},
+            {"name":"Minimum Lot Size","id":"sepp-pcr-minimum-lot-size","layerName":5,"isVisible":true,"opacity":0.01},
+            {"name":"Height of Building","id":"sepp-pcr-height-of-building","layerName":6,"isVisible":true,"opacity":0.01},
+            {"name":"Reduced Level","id":"sepp-pcr-reduced-level","layerName":7,"isVisible":true,"opacity":0.01},
+            {"name":"Flood","id":"sepp-pcr-flood","layerName":8,"isVisible":true,"opacity":0.01},
+            {"name":"Land Reservation Acquisition","id":"sepp-pcr-land-reservation-acquisition","layerName":9,"isVisible":true,"opacity":0.01},
+            {"name":"Additional Permitted Uses","id":"sepp-pcr-additional-permitted-uses","layerName":10,"isVisible":true,"opacity":0.01},
+            {"name":"Acid Sulfate Soils","id":"sepp-pcr-acid-sulfate-soils","layerName":11,"isVisible":true,"opacity":0.01},
+            {"name":"Environmental Conservation Area","id":"sepp-pcr-environmental-conservation-area","layerName":12,"isVisible":true,"opacity":0.01},
+            {"name":"Native Vegetation Protection","id":"sepp-pcr-native-vegetation-protection","layerName":13,"isVisible":true,"opacity":0.01},
+            {"name":"Intensive Urban Development","id":"sepp-pcr-intensive-urban-development","layerName":14,"isVisible":true,"opacity":0.01},
+            {"name":"Active Street Frontages","id":"sepp-pcr-active-street-frontages","layerName":15,"isVisible":true,"opacity":0.01},
+            {"name":"Dwelling Density","id":"sepp-pcr-dwelling-density","layerName":16,"isVisible":true,"opacity":0.01},
+            {"name":"Growth Centres","id":"sepp-pcr-growth-centres","layerName":17,"isVisible":true,"opacity":0.01},
+            {"name":"Heritage","id":"sepp-pcr-heritage","layerName":18,"isVisible":true,"opacity":0.01},
+            {"name":"Precinct Boundaries","id":"sepp-pcr-precinct-boundaries","layerName":19,"isVisible":true,"opacity":0.01},
+            {"name":"Riparian Lands and Watercourses","id":"sepp-pcr-riparian-lands-and-watercourses","layerName":20,"isVisible":true,"opacity":0.01},
+            {"name":"Special Provision","id":"sepp-pcr-special-provision","layerName":21,"isVisible":true,"opacity":0.01},
+            {"name":"Special Areas","id":"sepp-pcr-special-areas","layerName":22,"isVisible":true,"opacity":0.01}
+        ]
+    },
+    "SEPP (P-EHC)":{
+        id:"sepp-p-ehc",
+        isProperty:true,
+        source:"https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/SEPP_Precincts_Eastern_Harbour_City_2021/MapServer/export?",
+        layers:[
+            {"name":"Subject Land","id":"sepp-p-ehc-subject-land","layerName":1,"isVisible":true,"opacity":0.01},
+            {"name":"Land Application","id":"sepp-p-ehc-land-application","layerName":2,"isVisible":true,"opacity":0.01},
+            {"name":"Floor Space Ratio (n:1)","id":"sepp-p-ehc-floor-space-ratio-(n:1)","layerName":3,"isVisible":true,"opacity":0.01},
+            {"name":"Land Zoning","id":"sepp-p-ehc-land-zoning","layerName":4,"isVisible":true,"opacity":0.01},
+            {"name":"Height of Building","id":"sepp-p-ehc-height-of-building","layerName":5,"isVisible":true,"opacity":0.01},
+            {"name":"Gross Floor Area","id":"sepp-p-ehc-gross-floor-area","layerName":6,"isVisible":true,"opacity":0.01},
+            {"name":"Additional Permitted Uses","id":"sepp-p-ehc-additional-permitted-uses","layerName":7,"isVisible":true,"opacity":0.01},
+            {"name":"Luna Park Amusement Zone","id":"sepp-p-ehc-luna-park-amusement-zone","layerName":8,"isVisible":true,"opacity":0.01},
+            {"name":"Sydney Harbour Foreshore Sites","id":"sepp-p-ehc-sydney-harbour-foreshore-sites","layerName":9,"isVisible":true,"opacity":0.01},
+            {"name":"Sydney Harbour Port and Related Employment Lands","id":"sepp-p-ehc-sydney-harbour-port-and-related-employment-lands","layerName":10,"isVisible":true,"opacity":0.01}
+        ]
+    },
+    "SEPP (P-WPC)": {
+        id:"sepp-p-wpc",
+        isProperty:true,
+        source:"https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/SEPP_Precincts_Western_Parkland_City_2021/MapServer/export?",
+        layers:[
+            {"name":"Subject Land","id":"sepp-p-wpc-subject-land","layerName":1,"isVisible":true,"opacity":0.01},
+            {"name":"Land Application","id":"sepp-p-wpc-land-application","layerName":2,"isVisible":true,"opacity":0.01},
+            {"name":"Floor Space Ratio (n:1)","id":"sepp-p-wpc-floor-space-ratio-(n:1)","layerName":3,"isVisible":true,"opacity":0.01},
+            {"name":"Land Zoning","id":"sepp-p-wpc-land-zoning","layerName":4,"isVisible":true,"opacity":0.01},
+            {"name":"Minimum Lot Size","id":"sepp-p-wpc-minimum-lot-size","layerName":5,"isVisible":true,"opacity":0.01},
+            {"name":"Height of Building","id":"sepp-p-wpc-height-of-building","layerName":6,"isVisible":true,"opacity":0.01},
+            {"name":"Flood","id":"sepp-p-wpc-flood","layerName":7,"isVisible":true,"opacity":0.01},
+            {"name":"Land Reservation Acquisition","id":"sepp-p-wpc-land-reservation-acquisition","layerName":8,"isVisible":true,"opacity":0.01},
+            {"name":"Additional Permitted Uses","id":"sepp-p-wpc-additional-permitted-uses","layerName":9,"isVisible":true,"opacity":0.01},
+            {"name":"Environmental Conservation Area","id":"sepp-p-wpc-environmental-conservation-area","layerName":10,"isVisible":true,"opacity":0.01},
+            {"name":"Native Vegetation Protection","id":"sepp-p-wpc-native-vegetation-protection","layerName":11,"isVisible":true,"opacity":0.01},
+            {"name":"Dwelling Density","id":"sepp-p-wpc-dwelling-density","layerName":12,"isVisible":true,"opacity":0.01},
+            {"name":"Growth Centres","id":"sepp-p-wpc-growth-centres","layerName":13,"isVisible":true,"opacity":0.01},
+            {"name":"Heritage","id":"sepp-p-wpc-heritage","layerName":14,"isVisible":true,"opacity":0.01},
+            {"name":"Precinct Boundaries","id":"sepp-p-wpc-precinct-boundaries","layerName":15,"isVisible":true,"opacity":0.01},
+            {"name":"Riparian Lands and Watercourses","id":"sepp-p-wpc-riparian-lands-and-watercourses","layerName":16,"isVisible":true,"opacity":0.01},
+            {"name":"Special Provision","id":"sepp-p-wpc-special-provision","layerName":17,"isVisible":true,"opacity":0.01},
+            {"name":"Special Areas","id":"sepp-p-wpc-special-areas","layerName":18,"isVisible":true,"opacity":0.01},
+            {"name":"Urban Release Area","id":"sepp-p-wpc-urban-release-area","layerName":19,"isVisible":true,"opacity":0.01},
+            {"name":"Key Sites","id":"sepp-p-wpc-key-sites","layerName":20,"isVisible":true,"opacity":0.01},
+            {"name":"Transport & Arterial Road Infrastructure","id":"sepp-p-wpc-transport-&-arterial-road-infrastructure","layerName":21,"isVisible":true,"opacity":0.01},
+            {"name":"Public Safety Area","id":"sepp-p-wpc-public-safety-area","layerName":22,"isVisible":true,"opacity":0.01},
+            {"name":"Terrestrial Biodiversity","id":"sepp-p-wpc-terrestrial-biodiversity","layerName":23,"isVisible":true,"opacity":0.01},
+            {"name":"Obstacle Limitation Surface","id":"sepp-p-wpc-obstacle-limitation-surface","layerName":24,"isVisible":true,"opacity":0.01},
+            {"name":"Windshear Assessment Trigger Area","id":"sepp-p-wpc-windshear-assessment-trigger-area","layerName":25,"isVisible":true,"opacity":0.01},
+            {"name":"Airport Noise","id":"sepp-p-wpc-airport-noise","layerName":26,"isVisible":true,"opacity":0.01},
+            {"name":"Lighting Intensity Area","id":"sepp-p-wpc-lighting-intensity-area","layerName":27,"isVisible":true,"opacity":0.01},
+            {"name":"Light Control Zone A","id":"sepp-p-wpc-light-control-zone-a","layerName":28,"isVisible":true,"opacity":0.01},
+            {"name":"Light Control Zone B","id":"sepp-p-wpc-light-control-zone-b","layerName":29,"isVisible":true,"opacity":0.01},
+            {"name":"Light Control Zone C","id":"sepp-p-wpc-light-control-zone-c","layerName":30,"isVisible":true,"opacity":0.01},
+            {"name":"Light Control Zone D","id":"sepp-p-wpc-light-control-zone-d","layerName":31,"isVisible":true,"opacity":0.01},
+            {"name":"Wildlife Buffer Zone","id":"sepp-p-wpc-wildlife-buffer-zone","layerName":32,"isVisible":true,"opacity":0.01},
+            {"name":"Wildlife Buffer Zone 3km","id":"sepp-p-wpc-wildlife-buffer-zone-3km","layerName":33,"isVisible":true,"opacity":0.01},
+            {"name":"Wildlife Buffer Zone 8km","id":"sepp-p-wpc-wildlife-buffer-zone-8km","layerName":34,"isVisible":true,"opacity":0.01},
+            {"name":"Wildlife Buffer Zone 13km","id":"sepp-p-wpc-wildlife-buffer-zone-13km","layerName":35,"isVisible":true,"opacity":0.01},
+            {"name":"Wind Turbine Buffer Zone","id":"sepp-p-wpc-wind-turbine-buffer-zone","layerName":36,"isVisible":true,"opacity":0.01},
+            {"name":"Wind Turbine Buffer Zone 3km","id":"sepp-p-wpc-wind-turbine-buffer-zone-3km","layerName":37,"isVisible":true,"opacity":0.01},
+            {"name":"Wind Turbine Buffer Zone 30km","id":"sepp-p-wpc-wind-turbine-buffer-zone-30km","layerName":38,"isVisible":true,"opacity":0.01},
+            {"name":"1 in 100 AEP Flood Extents","id":"sepp-p-wpc-1-in-100-aep-flood-extents","layerName":39,"isVisible":true,"opacity":0.01},{"name":"Additional Controls","id":"sepp-p-wpc-additional-controls","layerName":40,"isVisible":true,"opacity":0.01},{"name":"Bulk Water Supply Infrastructure","id":"sepp-p-wpc-bulk-water-supply-infrastructure","layerName":41,"isVisible":true,"opacity":0.01}
+            
+        ]
+    },
+    "EPP (R&E)": {
+        id:"epp-re",
+        isProperty:true,
+        source:"https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/SEPP_Resources_and_Energy_2021/MapServer/export?",
+        layers:[
+            {"name":"Land Application","id":"epp-re-land-application","layerName":1,"isVisible":true,"opacity":0.01},
+            {"name":"Critical Industry Cluster Land (Viticulture)","id":"epp-re-critical-industry-cluster-land-(viticulture)","layerName":2,"isVisible":true,"opacity":0.01},
+            {"name":"Critical Industry Cluster Land (Equine)","id":"epp-re-critical-industry-cluster-land-(equine)","layerName":3,"isVisible":true,"opacity":0.01},
+            {"name":"Biophysical Strategic Agricultural Land","id":"epp-re-biophysical-strategic-agricultural-land","layerName":4,"isVisible":true,"opacity":0.01},
+            {"name":"Future Residential Growth Area","id":"epp-re-future-residential-growth-area","layerName":5,"isVisible":true,"opacity":0.01},
+            {"name":"Additional Rural Village Land","id":"epp-re-additional-rural-village-land","layerName":6,"isVisible":true,"opacity":0.01},
+            {"name":"Coal Seam Gas Exclusion","id":"epp-re-coal-seam-gas-exclusion","layerName":7,"isVisible":true,"opacity":0.01},
+            {"name":"Mineral and Resource Land","id":"epp-re-mineral-and-resource-land","layerName":8,"isVisible":true,"opacity":0.01}
+        ]
+    },
+    "SEPP (R&H)": {
+        id:"sepp-rh",
+        isProperty:true,
+        source:"https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/SEPP_Resilience_and_Hazards_2021/MapServer/export?",
+        layers:[
+            {"name":"Land Application Map","id":"epp-re-land-application-map","layerName":1,"isVisible":true,"opacity":0.01},
+            {"name":"Coastal Wetlands and Littoral Rainforests Area Map","id":"epp-re-coastal-wetlands-and-littoral-rainforests-area-map","layerName":2,"isVisible":true,"opacity":0.01},
+            {"name":"Coastal Wetlands","id":"epp-re-coastal-wetlands","layerName":3,"isVisible":true,"opacity":0.01},
+            {"name":"Littoral Rainforest","id":"epp-re-littoral-rainforest","layerName":4,"isVisible":true,"opacity":0.01},
+            {"name":"Coastal Vulnerability Area Map (Note: No map at this time)","id":"epp-re-coastal-vulnerability-area-map-(note:-no-map-at-this-time)","layerName":5,"isVisible":true,"opacity":0.01},
+            {"name":"Coastal Environment Area Map","id":"epp-re-coastal-environment-area-map","layerName":6,"isVisible":true,"opacity":0.01},
+            {"name":"Coastal Use Area Map","id":"epp-re-coastal-use-area-map","layerName":7,"isVisible":true,"opacity":0.01}
+        ]
+    },
+    "SEPP (T&I)": {
+        id:"sepp-ti",
+        isProperty:true,
+        source:"https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/SEPP_Transport_and_Infrastructure_2021/MapServer/export?",
+        layers:[
+            {"name":"Subject Land","id":"sepp-ti-subject-land","layerName":1,"isVisible":true,"opacity":0.01},
+            {"name":"Land Application","id":"sepp-ti-land-application","layerName":2,"isVisible":true,"opacity":0.01},
+            {"name":"Interim Rail Corridor Map","id":"sepp-ti-interim-rail-corridor-map","layerName":3,"isVisible":true,"opacity":0.01},
+            {"name":"Sydney Metro West Tunnel (Sydney Metro)","id":"sepp-ti-sydney-metro-west-tunnel-(sydney-metro)","layerName":4,"isVisible":true,"opacity":0.01},
+            {"name":"CBD Rail Link or CBD Metro (Zone B - Tunnel) (TfNSW)","id":"sepp-ti-cbd-rail-link-or-cbd-metro-(zone-b---tunnel)-(tfnsw)","layerName":5,"isVisible":true,"opacity":0.01},
+            {"name":"CBD Metro (Zone A - Above Ground) (TfNSW)","id":"sepp-ti-cbd-metro-(zone-a---above-ground)-(tfnsw)","layerName":6,"isVisible":true,"opacity":0.01},
+            {"name":"CBD Metro Station Extent (TfNSW)","id":"sepp-ti-cbd-metro-station-extent-(tfnsw)","layerName":7,"isVisible":true,"opacity":0.01},{"name":"Height of Building","id":"sepp-ti-height-of-building","layerName":8,"isVisible":true,"opacity":0.01},
+            {"name":"Land Zoning","id":"sepp-ti-land-zoning","layerName":9,"isVisible":true,"opacity":0.01},
+            {"name":"Special Provision","id":"sepp-ti-special-provision","layerName":10,"isVisible":true,"opacity":0.01},
+            {"name":"Outer Harbour Area","id":"sepp-ti-outer-harbour-area","layerName":11,"isVisible":true,"opacity":0.01},
+            {"name":"Lease Area","id":"sepp-ti-lease-area","layerName":12,"isVisible":true,"opacity":0.01},
+            {"name":"Referral Area","id":"sepp-ti-referral-area","layerName":13,"isVisible":true,"opacity":0.01},
+            {"name":"Additional Permitted Uses","id":"sepp-ti-additional-permitted-uses","layerName":14,"isVisible":true,"opacity":0.01}
+        ]
+    },
+    "SEPP Major": {
+        id:"sepp-major",
+        isProperty:true,
+        source:"https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/SEPP_Major_Infrastructure_Corridors_2020/MapServer/export?",
+        layers:[
+            {"name":"Land_Application","id":"sepp-major-land_application","layerName":1,"isVisible":true,"opacity":0.01}
+        ]
+    },
+
+    "Natural Hazards": {
+        id:"natural-hazards",
+        isProperty:true,
+        source:"https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/ePlanning/Planning_Portal_Hazard/MapServer/export?",
+        layers:[
+            {"name":"Bushfire Prone Land","id":"natural-hazards-bushfire-prone-land","layerName":229,"isVisible":true,"opacity":0.01},
+            {"name":"Flood Planning","id":"natural-hazards-flood-planning","layerName":230,"isVisible":true,"opacity":0.01},
+            {"name":"Hunter Valley Flood Mitigation Scheme Development Consent Area","id":"natural-hazards-hunter-valley-flood-mitigation-scheme-development-consent-area","layerName":231,"isVisible":true,"opacity":0.01},
+            {"name":"Landslide Risk Land","id":"natural-hazards-landslide-risk-land","layerName":232,"isVisible":true,"opacity":0.01}
+        ]
+    },
+    "Bushfire": {
+        id:"bushfire",
+        isProperty:true,
+        source:"https://spatial.industry.nsw.gov.au/arcgis/rest/services/CrownLands_Bushfire/Bushfire_RFSData/MapServer/export?",
+        layers:[
+            {"name":"Fire Trail","id":"bushfire-fire-trail","layerName":1,"isVisible":true,"opacity":0.01},
+            {"name":"BFMZ","id":"bushfire-bfmz","layerName":2,"isVisible":true,"opacity":0.01},
+            {"name":"HR Works","id":"bushfire-hr-works","layerName":3,"isVisible":true,"opacity":0.01},
+            {"name":"Bush Fire Prone Land","id":"bushfire-bush-fire-prone-land","layerName":4,"isVisible":true,"opacity":0.01},
+            {"name":"Wild Fire History","id":"bushfire-wild-fire-history","layerName":5,"isVisible":true,"opacity":0.01},
+            // {"name":"Jurisdiction","id":"bushfire-jurisdiction","layerName":6,"isVisible":true,"opacity":0.01},
+            {"name":"Station","id":"bushfire-station","layerName":7,"isVisible":true,"opacity":0.01},
+            {"name":"Neighbourhood Safer Places","id":"bushfire-neighbourhood-safer-places","layerName":8,"isVisible":true,"opacity":0.01},
+            {"name":"BFMC","id":"bushfire-bfmc","layerName":9,"isVisible":true,"opacity":0.01},
+            {"name":"NSW_Fire_Area","id":"bushfire-nsw_fire_area","layerName":10,"isVisible":true,"opacity":0.01},
+            {"name":"Brigade","id":"bushfire-brigade","layerName":11,"isVisible":true,"opacity":0.01},
+            {"name":"District","id":"bushfire-district","layerName":12,"isVisible":true,"opacity":0.01},
+            {"name":"Region","id":"bushfire-region","layerName":13,"isVisible":true,"opacity":0.01},
+            {"name":"Zone","id":"bushfire-zone","layerName":14,"isVisible":true,"opacity":0.01}
+        ]
+    },
+    "Biodiversity": {
+        id:"biodiversity",
+        isProperty:true,
+        source:"https://www.lmbc.nsw.gov.au/arcgis/rest/services/BV/BiodiversityValues/MapServer/export?",
+        layers:[
+            {"name":"Biodiversity Values","id":"biodiversity-biodiversity-values","layerName":0,"isVisible":true,"opacity":0.01}
+        ]
+    },
+    "NSW Declared Wilderness": {
+        id:"nsw-declared-wilderness",
+        isProperty:true,
+        source:"https://mapprod1.environment.nsw.gov.au/arcgis/rest/services/Landuse/decwild_D/MapServer/export?",
+        layers:[
+            {"name":"Labels","id":"nsw-declared-wilderness-labels","layerName":0,"isVisible":true,"opacity":0.01},
+            {"name":"Boundaries","id":"nsw-declared-wilderness-boundaries","layerName":1,"isVisible":true,"opacity":0.01},
+            {"name":"Areas","id":"nsw-declared-wilderness-areas","layerName":2,"isVisible":true,"opacity":0.01}
+        ]
+    },
+    "Sydney Water Supply": {
+        id:"sydney-water-supply",
+        isProperty:true,
+        source:"https://mapprod.waternsw.com.au/arcgis/rest/services/Public/Greater_Sydney_Declared_Catchment_and_Water_Supply_System/MapServer/export?",
+        layers:[
+            {"name":"Greater Sydney Dams and Reservoirs","id":"biodiversity-greater-sydney-dams-and-reservoirs","layerName":0,"isVisible":true,"opacity":0.01},
+            {"name":"Water NSW Special & Controlled Areas","id":"biodiversity-water-nsw-special-&-controlled-areas","layerName":1,"isVisible":true,"opacity":0.01},
+            {"name":"WaterNSW Declared Catchment - Total Area","id":"biodiversity-waternsw-declared-catchment---total-area","layerName":2,"isVisible":true,"opacity":0.01},
+            {"name":"Greater Sydney Water Supply System","id":"biodiversity-greater-sydney-water-supply-system","layerName":3,"isVisible":true,"opacity":0.01},
+            {"name":"WaterNSW Declared Catchment - Inner & Outer","id":"biodiversity-waternsw-declared-catchment---inner-&-outer","layerName":4,"isVisible":true,"opacity":0.01}
+        ]
+    },
+    "AppTracker": {
+        id:"app-tracker",
+        isProperty:true,
+        source:"https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/DA_Tracking/MapServer/export?",
+        layers:[
+            {"name":"DA_Tracking","id":"biodiversity-da_tracking","layerName":0,"isVisible":true,"opacity":0.01}
+        ]
+    },
+
+    // "Liverpool DCP ": {
+    //     id:"liverpool-dcp",
+    //     isProperty:true,
+    //     source:"/export?",
+    //     layers:[
+    //         {"name":"LCC DCP ROAD NETWORK","id":"liverpool-dcp-lcc-dcp-road-network","layerName":0,"isVisible":true,"opacity":0.01}
+    //     ]
+    // }
+
+
+    // Arial Images
+    // 1998 - https://portal.spatial.nsw.gov.au/tileservices/Hosted/HistoricalImagery1998/MapServer
+    // 1994 - https://portal.spatial.nsw.gov.au/tileservices/Hosted/HistoricalImagery1994/MapServer
+    // 1991 - https://portal.spatial.nsw.gov.au/tileservices/Hosted/HistoricalImagery1991/MapServer
+    // 1986 - https://portal.spatial.nsw.gov.au/tileservices/Hosted/HistoricalImagery1986/MapServer
+    // 1984 - https://portal.spatial.nsw.gov.au/tileservices/Hosted/HistoricalImagery1984/MapServer
+    // 1975 - https://portal.spatial.nsw.gov.au/tileservices/Hosted/HistoricalImagery1975/MapServer
+    // 1966 - https://portal.spatial.nsw.gov.au/tileservices/Hosted/HistoricalImagery1966/MapServer
+    // 1965 - https://portal.spatial.nsw.gov.au/tileservices/Hosted/HistoricalImagery1965/MapServer
+    // 1955 - https://portal.spatial.nsw.gov.au/tileservices/Hosted/HistoricalImagery1955/MapServer
+    // 1947 - https://portal.spatial.nsw.gov.au/tileservices/Hosted/HistoricalImagery1947/MapServer
+    // 1943 - https://portal.spatial.nsw.gov.au/tileservices/Hosted/HistoricalImagery1943/MapServer
+
+
+    // Roads data
+    // Road Layers:
+    // Liverpool DCP - https://services6.arcgis.com/Ys4U0NCXGgyTtRWx/arcgis/rest/services/LCC_DCP_road_network/FeatureServer/0
+    // Austral ILP - https://www.arcgis.com/home/item.html?id=146efec3b1d44b59ac86d3ca62c2e762
+    // Leppington ILP - https://www.arcgis.com/home/item.html?id=36128d960b6a4b29b2ec19f0b84b413c
+    // NSW Roads - https://portal.spatial.nsw.gov.au/server/rest/services/NSW_Transport_Theme/FeatureServer/5
+
+    // Aerial
+    // Aerial - https://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Imagery/MapServer
 };
