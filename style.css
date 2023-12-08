@@ -303,9 +303,9 @@ body {
 }
 
 .legend-body {
-    max-height: 200px;
+    max-height: 60vh;
     overflow-y: auto;
-    width: 250px;
+    width: 340px;
 }
 
 .legend-item {
@@ -319,9 +319,9 @@ body {
 }
 
 .legend-item img {
-    /* width: 220px; */
-    max-height: 600px;
-    /* object-fit: contain; */
+    max-width: 98%;
+    /* max-height: 600px; */
+    object-fit: contain;
 }
 
 .leaflet-container {

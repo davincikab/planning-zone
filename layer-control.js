@@ -72,7 +72,6 @@ let LayerControl = function(layers, map) {
             f:'image',
             size:'256,256',
             name:layer.name,
-            legendImage:layer.legendImage
         });
 
         tileWms.isProperty = true;
@@ -113,7 +112,7 @@ let LayerControl = function(layers, map) {
             let element = document.getElementById(`${layer.wmsParams.layerId}-${layer.wmsParams.layers}`);
 
             if(element) {
-                element.remove();
+                element.classList.add("d-none");
             }
 
         } else {
@@ -124,18 +123,69 @@ let LayerControl = function(layers, map) {
     this.toggleLegendContainer = (layer) => {
         let imageUrl = `${layer._url}?request=GetLegendGraphic%26version=1.3.0%26format=image/png%26layer=${layer.wmsParams.layers}`;
 
-        if(layer.wmsParams.legendImage) {
-            imageUrl = `data:image/png;base64,${layer.wmsParams.legendImage}`
+        let element = document.getElementById(`${layer.wmsParams.layerId}-${layer.wmsParams.layers}`);
+
+        if(element) {
+            element.classList.remove("d-none");
+            return;
         }
+
+        if(layer.isProperty) {
+            let url = layer._url;
+            url = url.replace(/export/, "legend?f=json");
+            console.log(url);
+            // https://maps.six.nsw.gov.au/arcgis/rest/services/public/Valuation/MapServer/legend?f=json&layer=1
+            // let 
+            let layerValue = parseInt(layer.wmsParams.layers.split(":")[1]);
+            console.log(layerValue);
+
+            fetch(url)
+            .then(res => res.json())
+            .then(({ layers }) => {
+                console.log(layers);
+                console.log(layer);
+
+                layers.map(entry => {
+                    if(entry.layerId == layerValue) {
+                        this.createLegendTable(entry, layer);
+                    }
+                    
+                });
+            })
+            .catch(console.error);
+        } else {
+            console.log(layer);
+            this.updateLegendItems(layer, imageUrl);
+        }      
+
+    }
+
+    this.createLegendTable = (legendValues, layer) => {
+        console.log(legendValues.legend);
+
+        let legendData = legendValues.legend.map(val => {
+            return `<tr>
+                <td>
+                    <img src="data:image/png;base64,${val.imageData}" />
+                </td>
+                <td>${val.label}</td>
+            </tr>`;
+        });
+
 
         let legendContent = `<div class="legend-item" id="${layer.wmsParams.layerId}-${layer.wmsParams.layers}">
             <div class="legend-text">${layer.wmsParams.name}</div>
-            <img src="${imageUrl}" alt="">
+           <table>
+            <tbody>
+                ${legendData.join("")}
+            </tbody>
+           </table>
         </div>`;
 
 
+
         let element = document.getElementById(`${layer.wmsParams.layerId}-${layer.wmsParams.layers}`);
-        console.log(layer.wmsParams.name.includes("Label"));
+        // console.log(layer.wmsParams.name.includes("Label"));
 
         if(!element && !layer.wmsParams.name.includes("Label")) {
             document.getElementById("legend-body").innerHTML += legendContent;
@@ -143,8 +193,24 @@ let LayerControl = function(layers, map) {
 
     }
 
+    this.updateLegendItems = (layer, imageUrl) => {
+        console.log(layer);
+        let legendContent = `<div class="legend-item" id="${layer.wmsParams.layerId}-${layer.wmsParams.layers}">
+            <div class="legend-text">${layer.wmsParams.name}</div>
+            <img src="${imageUrl}" alt="">
+        </div>`;
+
+
+        let element = document.getElementById(`${layer.wmsParams.layerId}-${layer.wmsParams.layers}`);
+        // console.log(layer.wmsParams.name.includes("Label"));
+
+        if(!element && !layer.wmsParams.name.includes("Label")) {
+            document.getElementById("legend-body").innerHTML += legendContent;
+        }
+    }
+
     this.toggleIsPropertyLegend = (layer) => {
-        
+        // https://maps.six.nsw.gov.au/arcgis/rest/services/public/Valuation/MapServer/legend?f=json
     }
 
 

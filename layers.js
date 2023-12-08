@@ -909,7 +909,7 @@ let mapLayers = {
     // }
 
 
-    // Arial Images
+    // Arial Images:DONE
     // 1998 - https://portal.spatial.nsw.gov.au/tileservices/Hosted/HistoricalImagery1998/MapServer
     // 1994 - https://portal.spatial.nsw.gov.au/tileservices/Hosted/HistoricalImagery1994/MapServer
     // 1991 - https://portal.spatial.nsw.gov.au/tileservices/Hosted/HistoricalImagery1991/MapServer
