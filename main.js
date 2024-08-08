@@ -6,19 +6,66 @@ var map = L.map('map', {
     // center: [-32.648, 146.359, ],
     // zoom: 4,
     minZoom:8,
-    maxBounds:[[-38.03, 139.965 ], [-27.839, 155.258]],
+    // maxBounds:[[-38.03, 139.965 ], [-27.839, 155.258]],
     zoom: 15,
-    maxZoom:22,
+    maxZoom:20,
     zoomControl:false
 });
 
 const infoContainer = document.getElementById("info-container");
 
+// custom igeocoder
+class CustomGeocoder {
+    options = {
+      serviceUrl: 'http://localhost:3000/address_autocomplete?query='
+    };
+  
+    constructor(options) {
+      L.Util.setOptions(this, options);
+    }
+
+    async geocode(query, cb, context) {
+        console.log(query);
+        let url = `${this.options.serviceUrl}${query}`;
+        let data = await fetch(url).then(res => res.json());
+
+        let results = data.features.map(loc => {
+            let center = loc.center;
+            let bbox = L.latLngBounds(center, center);
+            return{
+                name: loc.place_name,
+                bbox: bbox,
+                center: center,
+                properties: {...loc.properties}
+              };
+        });
+        
+
+        cb.call(context, results)
+    }
+
+    suggest(query, cb,) {
+        this.geocode(query, cb);
+    }
+
+    reverse() {
+
+    }
+}
+
+const customGeocoder = function() {
+    console.log("Custom Geocoder");
+    return new CustomGeocoder({});
+}
+
 // geocoder: Specify Australia
 let geocoderControl = new L.Control.Geocoder({ 
     collapsed:false,
+    maxZoom:13,
     defaultMarkGeocode:false,
-    geocoder: L.Control.Geocoder.mapbox({ 
+    geocoder: 
+    // customGeocoder()
+    L.Control.Geocoder.mapbox({ 
         // countries:'us',
         geocodingQueryParams:{countries: 'au', bbox: [139.965, -38.03, 155.258, -27.839]},
         apiKey: "pk.eyJ1IjoiaGlnaGlxIiwiYSI6ImNsNnVwbHFhMDBsamozbnA1ajBraHlqbmMifQ.mP1mWm5OxGRKfiN0qiH-bg" 
@@ -38,11 +85,13 @@ geocoderControl.on('markgeocode', function(e) {
     ])
     // .addTo(map);
 
-    marker.setLatLng(center).addTo(map);
-    map.fitBounds(poly.getBounds());
+    // marker.setLatLng(center).addTo(map);
+    map.fitBounds(poly.getBounds(), { maxZoom:17 });
 
     // onMapClick({latlng:center});
     // pdfModule.setLocation(center);
+
+    
 })
 .addTo(map);
 
@@ -82,74 +131,115 @@ let marker = L.marker(null);
 
 function onMapClick(e) {
     popup.setLatLng(e.latlng);
-    marker.setLatLng(e.latlng).addTo(map);
+    marker.setLatLng(e.latlng);
+    // .addTo(map);
     pdfModule.setLocation(e.latlng);
 
-    // query the boundary features
-    queryBoundaryFeatures(e.latlng);
-    if(map.drawMode || !layerControl.activeLayer.length) return;
-    var BBOX =         map.getBounds()._southWest.lng+","+map.getBounds()._southWest.lat+","+map.getBounds()._northEast.lng+","
-    +map.getBounds()._northEast.lat;
+    // query cadastre data
+    let coords = Object.values(e.latlng).reverse();
+    getAdditionalLayerInfo(e);
 
-    var WIDTH= map.getSize().x;
-    var HEIGHT = map.getSize().y;
+    // cadastreFeature.query()
+    // .intersects({"type":"Point", "coordinates":[...coords]})
+    // .run((err, fc) => { 
+    //     if(fc.features.length) {
+    //         console.log(fc);
 
-    let layerPoints = map.latLngToLayerPoint(e.latlng)
-    var X =  map.layerPointToContainerPoint(layerPoints).x;
-    var Y = map.layerPointToContainerPoint(layerPoints).y;
-    console.log(X,Y);
+    //         cadastreSelectedLayer.clearLayers().addData(fc);
+    //         let vertexCount = 0;
+    //         let coords = [];
+    //         turf.coordEach(fc.features[0], (
+    //             currentCoord,
+    //             coordIndex,
+    //             featureIndex,
+    //             multiFeatureIndex,
+    //             geometryIndex,
+    //         ) => {
+    //             if(coordIndex == 0) {
+    //                 console.log("Initial Coord");
+    //             }
 
-    let { layers, name } = layerControl.activeLayer[0].wmsParams;
-    
-    
-    // fetch the json data
-    let jsonUrl = `${layerControl.activeLayer[0]._url}?service=WMS&VERSION=1.1.1&REQUEST=GetFeatureInfo&layers=${layers}&QUERY_LAYERS=${layers}&STYLES=&BBOX=${BBOX}&FEATURE_COUNT=5&HEIGHT=${HEIGHT}&WIDTH=${WIDTH}&INFO_FORMAT=text/xml&SRS=EPSG%3A4326&X=${X}&Y=${Y}`;
-    let {x, y} = L.CRS.EPSG3857.project(e.latlng);
-    let geometry = {"xmin":x - 115,"ymin":y-115,"xmax":x+115, "ymax":y+115, "spatialReference":{"wkid":102100,"latestWkid":3857}}
-    let query = `where=(1=1) AND (1=1)&returnGeometry=true&spatialRel=esriSpatialRelIntersects&geometry=${JSON.stringify(geometry)}&geometryType=esriGeometryEnvelope&inSR=102100&outFields=*&outSR=102100`;
+    //             coords.push(currentCoord);
+    //             vertexCount++;
+    //         });
 
-    let jsonUrls = layerControl.activeLayer.map(layer => {
-        // fix this to handle multiple layer options
-        let { layers, name, layerId } = layer.wmsParams;
-        if(layer.isProperty) {
-            layers = layers.split(":");
-            return {name, id:layerId, url:`https://mapprod1.environment.nsw.gov.au/arcgis/rest/services/Planning/EPI_Development_Control_Layers/MapServer/${layers[1]}/query?f=geojson&${query}`};
-        }
+    //         updateLotDetails(e, fc.features[0], coords, vertexCount - 1);
+           
+    //     }
 
-        return {name, id:layerId, url:`${layer._url}?service=WMS&VERSION=1.1.1&REQUEST=GetFeatureInfo&layers=${layers}&QUERY_LAYERS=${layers}&STYLES=&BBOX=${BBOX}&FEATURE_COUNT=2&HEIGHT=${HEIGHT}&WIDTH=${WIDTH}&INFO_FORMAT=text/xml&SRS=EPSG%3A4326&X=${X}&Y=${Y}`};
-    });
+    //     // 
+    //     getAdditionalLayerInfo(e);
+    // });   
+}
 
-    let xmlUrls = jsonUrls.filter(({url}) => !url.includes('esriSpatialRelIntersects'))
-    let geojsonUrls = jsonUrls.filter(({url}) => url.includes('esriSpatialRelIntersects'))
-    
-    let fetchRequests = xmlUrls.map(jsonUrl => jsonUrl.url).map(url => fetch(url, { cors:'no-cors' }));
-    let exportUrlsRequest = geojsonUrls.map(jsonUrl => jsonUrl.url).map(url => fetch(url, { cors:'cors' }))
-    
-    Promise.all(fetchRequests)
-    .then(res => Promise.all(res.map(rs =>rs.text())))
-    .then(responseString => {
-        let xmlProps = responseString.map((str,i) => {
-            let jsonData = JSON.parse(xml2json(str));
-            let {name, id} = xmlUrls[i];
-            
-            return preprocessXml(jsonData, name, id);            
-        }).filter(properties => properties);
+function getAdditionalLayerInfo(e) {
+     // query the boundary features
+     queryBoundaryFeatures(e.latlng);
 
-        Promise.all(exportUrlsRequest)
-        .then(res => Promise.all(res.map(rs =>rs.json())))
-        .then(responseData => {
-
-            let geojsonProps = responseData.map((entry, i) => {
-                let {name, id} = xmlUrls[i];
-
-                return (entry.features && entry.features.length) ? {...entry.features[0].properties, id:name, id} : null
-            }).filter(props => props);
-
-            renderPopupContent([...xmlProps, ...geojsonProps])
-        })
-        
-    })
-    .catch(console.error);
+    //  return;
+     if(map.drawMode || !layerControl.activeLayer.length) return;
+     var BBOX =         map.getBounds()._southWest.lng+","+map.getBounds()._southWest.lat+","+map.getBounds()._northEast.lng+","
+     +map.getBounds()._northEast.lat;
+ 
+     var WIDTH= map.getSize().x;
+     var HEIGHT = map.getSize().y;
+ 
+     let layerPoints = map.latLngToLayerPoint(e.latlng)
+     var X =  map.layerPointToContainerPoint(layerPoints).x;
+     var Y = map.layerPointToContainerPoint(layerPoints).y;
+     console.log(X,Y);
+ 
+     let { layers, name } = layerControl.activeLayer[0].wmsParams;
+     
+     
+     // fetch the json data
+     let jsonUrl = `${layerControl.activeLayer[0]._url}?service=WMS&VERSION=1.1.1&REQUEST=GetFeatureInfo&layers=${layers}&QUERY_LAYERS=${layers}&STYLES=&BBOX=${BBOX}&FEATURE_COUNT=5&HEIGHT=${HEIGHT}&WIDTH=${WIDTH}&INFO_FORMAT=text/xml&SRS=EPSG%3A4326&X=${X}&Y=${Y}`;
+     let {x, y} = L.CRS.EPSG3857.project(e.latlng);
+     let geometry = {"xmin":x - 115,"ymin":y-115,"xmax":x+115, "ymax":y+115, "spatialReference":{"wkid":102100,"latestWkid":3857}}
+     let query = `where=(1=1) AND (1=1)&returnGeometry=true&spatialRel=esriSpatialRelIntersects&geometry=${JSON.stringify(geometry)}&geometryType=esriGeometryEnvelope&inSR=102100&outFields=*&outSR=102100`;
+ 
+     let jsonUrls = layerControl.activeLayer.map(layer => {
+         // fix this to handle multiple layer options
+         let { layers, name, layerId } = layer.wmsParams;
+         if(layer.isProperty) {
+             layers = layers.split(":");
+             return {name, id:layerId, url:`https://mapprod1.environment.nsw.gov.au/arcgis/rest/services/Planning/EPI_Development_Control_Layers/MapServer/${layers[1]}/query?f=geojson&${query}`};
+         }
+ 
+         return {name, id:layerId, url:`${layer._url}?service=WMS&VERSION=1.1.1&REQUEST=GetFeatureInfo&layers=${layers}&QUERY_LAYERS=${layers}&STYLES=&BBOX=${BBOX}&FEATURE_COUNT=2&HEIGHT=${HEIGHT}&WIDTH=${WIDTH}&INFO_FORMAT=text/xml&SRS=EPSG%3A4326&X=${X}&Y=${Y}`};
+     });
+ 
+     let xmlUrls = jsonUrls.filter(({url}) => !url.includes('esriSpatialRelIntersects'))
+     let geojsonUrls = jsonUrls.filter(({url}) => url.includes('esriSpatialRelIntersects'))
+     
+     let fetchRequests = xmlUrls.map(jsonUrl => jsonUrl.url).map(url => fetch(url, { cors:'no-cors' }));
+     let exportUrlsRequest = geojsonUrls.map(jsonUrl => jsonUrl.url).map(url => fetch(url, { cors:'cors' }))
+     
+     Promise.all(fetchRequests)
+     .then(res => Promise.all(res.map(rs =>rs.text())))
+     .then(responseString => {
+         let xmlProps = responseString.map((str,i) => {
+             let jsonData = JSON.parse(xml2json(str));
+             let {name, id} = xmlUrls[i];
+             
+             return preprocessXml(jsonData, name, id);            
+         }).filter(properties => properties);
+ 
+         Promise.all(exportUrlsRequest)
+         .then(res => Promise.all(res.map(rs =>rs.json())))
+         .then(responseData => {
+ 
+             let geojsonProps = responseData.map((entry, i) => {
+                 let {name, id} = xmlUrls[i];
+ 
+                 return (entry.features && entry.features.length) ? {...entry.features[0].properties, id:name, id} : null
+             }).filter(props => props);
+ 
+             renderPopupContent([...xmlProps, ...geojsonProps])
+         })
+         
+     })
+     .catch(console.error);
 }
 
 function renderPopupContent(props) {
@@ -191,8 +281,6 @@ function createPopupContent(properties, name) {
     ];
 
     let keys = columnValues[properties.id] ?  columnValues[properties.id].columns : Object.keys(properties);
-
-    console.log(properties);
 
     let content = "", title=name;
     let rows = keys.filter(key => cols.indexOf(key) == -1).map(key => {
@@ -549,6 +637,27 @@ const cadastreStyle = {
     weight: 1
 };
 
+const cadastreSelectedLayer = L.geoJSON(null, {
+    style:function(feauture) {
+        return {
+            color:'#f87217',
+            weight:2.5,
+            fillColor:'transparent'
+        }
+    }
+}).addTo(map);
+
+const cadastreDimensionsLayer = L.geoJSON(null, {
+    pointToLayer:function (ft, latlng) {
+        let icon = L.divIcon({
+            className:'dimension-layer',
+            html:`<div style="transform:rotate(${ft.properties.bearing - 90}deg); font-size:9px">${ft.properties.length} m</div>`
+        });
+
+        return L.marker(latlng, { icon: icon })
+    }
+}).addTo(map);
+
 
 const cadastreFeature = L.esri
 .featureLayer({
@@ -556,7 +665,28 @@ const cadastreFeature = L.esri
     onEachFeature:function(feature, layer) {
         layer.on("click",(e) => {
             console.log(e.target);
-            updateLotDetails(e, feature);
+           
+
+            let vertexCount = 0;
+            let coords = [];
+            turf.coordEach(feature, (
+                currentCoord,
+                coordIndex,
+                featureIndex,
+                multiFeatureIndex,
+                geometryIndex,
+            ) => {
+                if(coordIndex == 0) {
+                    console.log("Initial Coord");
+                }
+
+                coords.push(currentCoord);
+                vertexCount++;
+            });
+
+            updateLotDetails(e, feature, coords, vertexCount - 1);
+
+            // console.log("Vertices: ", vertexCount - 1);
 
             if(selectedLayer) {
                 selectedLayer.setStyle({
@@ -606,12 +736,37 @@ const cadastreFeature = L.esri
         });
 
     },
-    minZoom:15,
+    minZoom:14,
     style:function(feature) {
         return {...cadastreStyle}
     }
 }).addTo(map);
 
+// https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Common/AddressSearch/MapServer/0
+const cadastreWMS =  L.tileLayer.wms("https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Common/AddressSearch/MapServer/export?", {
+    layers: `show:0`,
+    styles:'default',
+    format: 'png',
+    maxZoom:20,
+    transparent: true,
+    crs:L.CRS.EPSG3857,
+    bboxSR:3857,
+    imageSR:3857,
+    attribution: "NSW",
+    layerId:'cadastre',
+    f:'image',
+    size:'256,256',
+    dpi:96,
+    name:'cadastre'
+});
+// .addTo(map);
+
+cadastreWMS.on("click" , (e) => {
+    console.log("Click");
+});
+
+
+// https://planzone.online:2083/invitation?user=david@planzone.online&cookie=_2KmkkHrq6V1PYl4
 const suburbStyle = {
     fillColor:'transparent',
     fillOpacity:0,
@@ -731,10 +886,54 @@ map.on("zoomend", (e) => {
     }
 })
 
-function updateLotDetails(e, feature) {
+function updateLotDetails(e, feature, layerCoords, sides) {
     let { properties } = feature;
     let areaM = turf.area(feature);
-    console.log(areaM);
+
+    let sidesFeatures = [];
+    for (let index = 0; index < sides; index++) {
+
+        let lineString = turf.lineString([layerCoords[index], layerCoords[index + 1]] );
+        let length = turf.length(lineString);
+
+        let midpoint = turf.midpoint( turf.point(layerCoords[index]), turf.point(layerCoords[index + 1]) );
+        let bearing = turf.bearing( turf.point(layerCoords[index]), turf.point(layerCoords[index + 1]) );
+
+        midpoint.properties.length = (length * 1000).toFixed(2);
+        midpoint.properties.bearing = bearing.toFixed(0);
+        sidesFeatures.push(midpoint);
+    }
+
+    let currentIndex = 0, features = [];
+
+    sidesFeatures.forEach(ft => {
+        if(features.length) {
+            let currFeature = features[currentIndex];
+
+            let difference = Math.abs(parseFloat(currFeature.properties.bearing) - parseFloat(ft.properties.bearing));
+
+            if(difference < 10) {
+                let length = parseFloat(currFeature.properties.length) + parseFloat(ft.properties.length);
+                let bearing = (parseFloat(currFeature.properties.bearing) + parseFloat(ft.properties.bearing)) / 2;
+
+                let midpoint = turf.midpoint(currFeature, ft);
+                
+                features[currentIndex] = {...midpoint, properties:{length: length.toFixed(2), bearing } };
+                currentIndex = features.length - 1;
+            } else {
+                features.push(ft);
+                currentIndex = features.length - 1;
+            }
+
+        } else {
+            features.push(ft);
+            // currentIndex += 1;
+        }
+    });
+
+    qikanyanjuidavid
+
+    cadastreDimensionsLayer.clearLayers().addData({"type":"FeatureCollection", "features":[...features]});
 
     pdfModule.targetFeature = feature;
     // pdfModule
@@ -857,7 +1056,7 @@ function queryBoundaryFeatures(location) {
     let coords = Object.values(location).reverse();
 
     let features = [
-        {label:'Suburb', layer:suburbFeature, targetColumn:'SUBURBNAME'},
+        // {label:'Suburb', layer:suburbFeature, targetColumn:'SUBURBNAME'},
         {label:'Local Government Area', layer:lgaFeature, targetColumn:'LGANAME'},
         {label:'Federal Electorate District', layer:federalElectoralFeature, targetColumn:'DIVISIONNAME'},
         {label:'State Electorate District', layer:stateElectoralFeature, targetColumn:'DISTRICTNAME'}
@@ -1098,3 +1297,30 @@ function createLayers(prefixId, layerList) {
     return groupLayers;
     console.log(groupLayers);
 }
+
+const debounce = (callback, wait) => {
+    let timeoutId = null;
+    return (...args) => {
+      window.clearTimeout(timeoutId);
+      timeoutId = window.setTimeout(() => {
+        callback.apply(null, args);
+      }, wait);
+    };
+  }
+
+
+// auto complete
+const getAddresses = async (query) => {
+    let response = await fetch(`http://localhost:3000/address_autocomplete?query=${query}`).then(res => res.json());
+    console.log(response);
+}
+const handleUserInput = debounce((event) => {
+    let { value } = event.target;
+    
+    if(value.length > 2) {
+        console.log(value);
+        getAddresses(value)
+    }
+}, 300);
+
+document.getElementById("query").addEventListener("input", handleUserInput);

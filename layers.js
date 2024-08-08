@@ -92,32 +92,46 @@ let mapLayers = {
     },
     'NSW Cadastre':{
         id:'cadastre',
-        // source:'https://maps.six.nsw.gov.au/arcgis/services/public/NSW_Cadastre/MapServer/WMSServer?request=GetCapabilities&service=WMS'
-        source:'https://maps.six.nsw.gov.au/arcgis/services/public/NSW_Cadastre/MapServer/WmsServer',
+        source:'https://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Cadastre/MapServer/export',
+        isProperty:true,
         layers:[
-            
-            {"name":"Lot","id":"lot", "layers":[1,7],"layerName":"1,7","bounds":[[-37.440737,140.999313],[-28.157021,159.084568]] },
-            {"name":"PlanExtent","id":"planextent", "layers":[2,9],"layerName":"2,9","bounds":[[-37.440737,140.999313],[-28.157021,159.084568]] },
-            {"name":"SectionExtent","id":"sectionextent", "layers":[3,8],"layerName":"3,8","bounds":[[-37.217041,141.001141],[-28.1681,153.635972]] },
-            {"name":"Rural_PlanExtent","id":"rural_planextent","layerName":"4","bounds":[[-37.440737,140.999313],[-28.157021,159.084568]] },
+            {"name":"Lot","id":"lot-sample", "layers":[1,7],"layerName":"9,3","bounds":[[-37.440737,140.999313],[-28.157021,159.084568]] },
+            {"name":"PlanExtent","id":"planextent", "layers":[2,9],"layerName":"8,1","bounds":[[-37.440737,140.999313],[-28.157021,159.084568]] },
+            {"name":"SectionExtent","id":"sectionextent", "layers":[3,8],"layerName":"7,2","bounds":[[-37.217041,141.001141],[-28.1681,153.635972]] },
+            {"name":"Rural_PlanExtent","id":"rural_planextent","layerName":"6","bounds":[[-37.440737,140.999313],[-28.157021,159.084568]] },
             {"name":"Large_Rural_PlanExtent","id":"large_rural_planextent","layerName":"5","bounds":[[-37.440737,140.999313],[-28.157021,159.084568]] },
-            
-            // {"name":"Lot Labels","id":"lot-labels","layerName":"7","bounds":[[-37.440737,140.999313],[-28.157021,159.084568]]},
-            // {"name":"Section Extent Labels","id":"section-extent-labels","layerName":"8","bounds":[[-37.440737,140.999313],[-28.157021,159.084568]]},
-            // {"name":"Plan Extent Labels","id":"plan-extent-labels","layerName":"9","bounds":[[-37.440737,140.999313],[-28.157021,159.084568]]}
         ]
     },
+    // 'NSW Cadastre':{
+    //     id:'cadastre',
+    //     // source:'https://maps.six.nsw.gov.au/arcgis/services/public/NSW_Cadastre/MapServer/WMSServer?request=GetCapabilities&service=WMS'
+    //     source:'https://maps.six.nsw.gov.au/arcgis/services/public/NSW_Cadastre/MapServer/WmsServer',
+    //     layers:[
+            
+    //         {"name":"Lot","id":"lot", "layers":[1,7],"layerName":"1,7","bounds":[[-37.440737,140.999313],[-28.157021,159.084568]] },
+    //         {"name":"PlanExtent","id":"planextent", "layers":[2,9],"layerName":"2,9","bounds":[[-37.440737,140.999313],[-28.157021,159.084568]] },
+    //         {"name":"SectionExtent","id":"sectionextent", "layers":[3,8],"layerName":"3,8","bounds":[[-37.217041,141.001141],[-28.1681,153.635972]] },
+    //         {"name":"Rural_PlanExtent","id":"rural_planextent","layerName":"4","bounds":[[-37.440737,140.999313],[-28.157021,159.084568]] },
+    //         {"name":"Large_Rural_PlanExtent","id":"large_rural_planextent","layerName":"5","bounds":[[-37.440737,140.999313],[-28.157021,159.084568]] },
+            
+    //         // {"name":"Lot Labels","id":"lot-labels","layerName":"7","bounds":[[-37.440737,140.999313],[-28.157021,159.084568]]},
+    //         // {"name":"Section Extent Labels","id":"section-extent-labels","layerName":"8","bounds":[[-37.440737,140.999313],[-28.157021,159.084568]]},
+    //         // {"name":"Plan Extent Labels","id":"plan-extent-labels","layerName":"9","bounds":[[-37.440737,140.999313],[-28.157021,159.084568]]}
+    //     ]
+    // },
     // https://mapprod3.environment.nsw.gov.au/arcgis/services/Planning/EPI_Primary_Planning_Layers/MapServer/WMSServer?request=DescribeLayer&layers=6&service=WMS
     'Primary Planning Layer':{
         id:'planning-layers',
-        source:'https://mapprod3.environment.nsw.gov.au:443/arcgis/services/Planning/EPI_Primary_Planning_Layers/MapServer/WmsServer',
+        isProperty:true,
+        source:"https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/EPI_Primary_Planning_Layers/MapServer/export",
+        // source:'https://mapprod3.environment.nsw.gov.au:443/arcgis/services/Planning/EPI_Primary_Planning_Layers/MapServer/WmsServer',
         wmsSource:'https://mapprod3.environment.nsw.gov.au/arcgis/services/Planning/EPI_Primary_Planning_Layers/MapServer/WMSServer?request=GetCapabilities&service=WMS',
         layers:[ 
             {
                 name:'Land Zoning',
                 id:'land-zoning',
                 url:'https://mapprod3.environment.nsw.gov.au/arcgis/services/Planning/EPI_Primary_Planning_Layers/MapServer/WMSServer',
-                layerName:4,
+                layerName:2,
                 bounds:[[-38,39],[-28.15702055490766, 159.34057684750007]],
                 isVisible:true,
                 opacity:0.5,
@@ -128,7 +142,7 @@ let mapLayers = {
                 name:'FSR',
                 id:'fsr',
                 url:'https://mapprod3.environment.nsw.gov.au/arcgis/services/Planning/EPI_Primary_Planning_Layers/MapServer/WMSServer',
-                layerName:5,
+                layerName:1,
                 isVisible:true,
                 opacity:0.01,
                 bounds:[[-37.11571532490041, 146.1766831521427], [-28.158307262494475,153.63694544428677]],
@@ -139,7 +153,7 @@ let mapLayers = {
                 name:'Height of Buildings',
                 id:'building-height',
                 url:'https://mapprod3.environment.nsw.gov.au/arcgis/services/Planning/EPI_Primary_Planning_Layers/MapServer/WMSServer',
-                layerName:1,
+                layerName:5,
                 isVisible:true,
                 opacity:0.01,
                 bounds:[[-38,139],[-28.158307262494475, 153.63883177900004]],
@@ -150,7 +164,7 @@ let mapLayers = {
                 name:'Lot Size',
                 id:'lot-size',
                 url:'https://mapprod3.environment.nsw.gov.au/arcgis/services/Planning/EPI_Primary_Planning_Layers/MapServer/WMSServer',
-                layerName:2,
+                layerName:4,
                 isVisible:true,
                 opacity:0.01,
                 bounds:[[-38, 139], [-28.16563687599995, 153.6369444940001]],
@@ -161,7 +175,7 @@ let mapLayers = {
                 name:'Heritage',
                 id:'heritage',
                 url:'https://mapprod3.environment.nsw.gov.au/arcgis/services/Planning/EPI_Primary_Planning_Layers/MapServer/WMSServer/',
-                layerName:6,
+                layerName:0,
                 isVisible:true,
                 opacity:0.5,
                 bounds:[[-38, 139],[-28.18421045699995, 153.63689452000006]],
@@ -185,7 +199,7 @@ let mapLayers = {
                 name:'Land Application',
                 id:'land-application',
                 url:'https://mapprod3.environment.nsw.gov.au/arcgis/services/PlanningEPI_Primary_Planning_Layers/MapServer/WMSServer',
-                layerName:0,
+                layerName:6,
                 isVisible:true,
                 opacity:0.01,
                 bounds:[[ -37.528013948999956, 140.99926130831747], [-28.141279486999963, 159.3402948800001]],
@@ -287,19 +301,21 @@ let mapLayers = {
     },
     'Harzards':{
         id:'hazard',
-        source:'https://mapprod3.environment.nsw.gov.au/arcgis/services/Planning/Hazard/MapServer/WMSServer',
+        isProperty:true,
+        source:"https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/Hazard/MapServer/export",
+        // source:'https://mapprod3.environment.nsw.gov.au/arcgis/services/Planning/Hazard/MapServer/WMSServer',
         layers:[
             {
                 name:'Flood Zoning',
                 id:'flood-zoning',
-                layerName:2,
+                layerName:1,
                 bounds:[[-36.91905531599997, 141.69770346100006],[-28.167527916999973, 153.59449700200025]],
                 tile:'https://mapprod3.environment.nsw.gov.au/arcgis/services/Planning/Hazard/MapServer/WmsServer?service=WMS&request=GetMap&layers=1&styles=default&format=image%2Fpng&transparent=true&version=1.1.1&width=256&height=256&srs=EPSG:3857&bbox={bbox-epsg-3857}'
             },
             {
                 name:'Landslide Risk Land',
                 id:'landslide-risk-land',
-                layerName:1,
+                layerName:2,
                 bounds:[[-36.66481367799997, 147.852926872],[-28.71388766599995, 153.45107407800003]],
                 tile:'https://mapprod3.environment.nsw.gov.au/arcgis/services/Planning/Hazard/MapServer/WmsServer?service=WMS&request=GetMap&layers=1&styles=default&format=image%2Fpng&transparent=true&version=1.1.1&width=256&height=256&srs=EPSG:3857&bbox={bbox-epsg-3857}'
             },
@@ -307,91 +323,91 @@ let mapLayers = {
     },
     'Protection':{
         id:'hazard',
-        // https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/Protection/MapServer/0
+        source:"https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/Protection/MapServer/export",
         isProperty:true,
-        source:'https://mapprod3.environment.nsw.gov.au/arcgis/services/Planning/Protection/MapServer/WmsServer',
+        // source:'https://mapprod3.environment.nsw.gov.au/arcgis/services/Planning/Protection/MapServer/WmsServer',
         layers:[
             {
                 name:'Acid Sulfate Soils',
                 id:'acid-sulfate-soils',
-                layerName:12,isVisible:true,opacity:0.5,
+                layerName:1,isVisible:true,opacity:0.5,
                 bounds:[[-37.47131246799995, 149.8492960750001],[-28.158307253999965, 153.62515875200006]],
                 tile:'https://mapprod3.environment.nsw.gov.au/arcgis/services/Planning/Protection/MapServer/WmsServer?service=WMS&request=GetMap&layers=1&styles=default&format=image%2Fpng&transparent=true&version=1.1.1&width=256&height=256&srs=EPSG:3857&bbox={bbox-epsg-3857}'
             },
             {
                 name:'Airport Noise',
                 id:'airport-noise',
-                layerName:11,isVisible:true,opacity:0.5,
+                layerName:2,isVisible:true,opacity:0.5,
                 bounds:[[-33.97060082499996, 150.532780999],[-31.05787996899994, 152.01368631200012]],
                 tile:'https://mapprod3.environment.nsw.gov.au/arcgis/services/Planning/Protection/MapServer/WmsServer?service=WMS&request=GetMap&layers=2&styles=default&format=image%2Fpng&transparent=true&version=1.1.1&width=256&height=256&srs=EPSG:3857&bbox={bbox-epsg-3857}'
             },
             {
                 name:'Drinking Water Catchment',
                 id:'drinking-water-catchment',
-                layerName:10,isVisible:true,opacity:0.01,
+                layerName:3,isVisible:true,opacity:0.01,
                 bounds:[[-36.00945061632382, 148.5536220880001],[-28.246185064999963, 153.59697941500008]],
                 tile:'https://mapprod3.environment.nsw.gov.au/arcgis/services/Planning/Protection/MapServer/WmsServer?service=WMS&request=GetMap&layers=3&styles=default&format=image%2Fpng&transparent=true&version=1.1.1&width=256&height=256&srs=EPSG:3857&bbox={bbox-epsg-3857}'
             },
             {
                 name:'Groundwater Vulnerability',
                 id:'groundwater-vulnerability',
-                layerName:9,isVisible:true,opacity:0.01,
+                layerName:4,isVisible:true,opacity:0.01,
                 bounds:[[ -36.550291081999944, 143.21216088100005],[-30.512751081999966, 151.23222935800004]],
                 tile:'https://mapprod3.environment.nsw.gov.au/arcgis/services/Planning/Protection/MapServer/WmsServer?service=WMS&request=GetMap&layers=4&styles=default&format=image%2Fpng&transparent=true&version=1.1.1&width=256&height=256&srs=EPSG:3857&bbox={bbox-epsg-3857}'
             },
             {
                 name:'Mineral and Resource Land',
                 id:'mineral-resource',
-                layerName:8,isVisible:true,opacity:0.01,
+                layerName:5,isVisible:true,opacity:0.01,
                 bounds:[[-35.413181614999985, 147.3151658380001],[-28.66706676499996, 153.01932742500003]],
                 tile:'https://mapprod3.environment.nsw.gov.au/arcgis/services/Planning/Protection/MapServer/WmsServer?service=WMS&request=GetMap&layers=5&styles=default&format=image%2Fpng&transparent=true&version=1.1.1&width=256&height=256&srs=EPSG:3857&bbox={bbox-epsg-3857}'
             },
             {
                 name:'Obstacle Limitation Surface',
                 id:'obstacle-limitation-surface',
-                layerName:7,isVisible:true,opacity:0.01,
+                layerName:6,isVisible:true,opacity:0.01,
                 bounds:[[-35.86555250299995, 145.42638061800005],[-28.30466605299995, 153.44135939000012]],
                 tile:'https://mapprod3.environment.nsw.gov.au/arcgis/services/Planning/Protection/MapServer/WmsServer?service=WMS&request=GetMap&layers=6&styles=default&format=image%2Fpng&transparent=true&version=1.1.1&width=256&height=256&srs=EPSG:3857&bbox={bbox-epsg-3857}'
             },
             {
                 name:'Riparian Lands and Watercourses',
                 id:'riparian-lands',
-                layerName:6,isVisible:true,opacity:0.5,
+                layerName:7,isVisible:true,opacity:0.5,
                 bounds:[[-37.26338158434629, 141.0013293400001],[-28.710697403999973, 153.47538800400002]],
                 tile:'https://mapprod3.environment.nsw.gov.au/arcgis/services/Planning/Protection/MapServer/WmsServer?service=WMS&request=GetMap&layers=7&styles=default&format=image%2Fpng&transparent=true&version=1.1.1&width=256&height=256&srs=EPSG:3857&bbox={bbox-epsg-3857}'
             },
             {
                 name:'Salinity',
                 id:'salinity',
-                layerName:5,isVisible:true,opacity:0.01,
+                layerName:8,isVisible:true,opacity:0.01,
                 bounds:[[-35.39814631399997, 146.473591004],[-29.197733722999942, 151.0091805410001]],
                 tile:'https://mapprod3.environment.nsw.gov.au/arcgis/services/Planning/Protection/MapServer/WmsServer?service=WMS&request=GetMap&layers=8&styles=default&format=image%2Fpng&transparent=true&version=1.1.1&width=256&height=256&srs=EPSG:3857&bbox={bbox-epsg-3857}'
             },
             {
                 name:'Scenic Protection Land',
                 id:'scenic-protection-land',
-                layerName:4,
+                layerName:9,
                 bounds:[[-36.68993677299994, 148.4433061000001],[-30.883680699999957, 153.07273794500009]],
                 tile:'https://mapprod3.environment.nsw.gov.au/arcgis/services/Planning/Protection/MapServer/WmsServer?service=WMS&request=GetMap&layers=9&styles=default&format=image%2Fpng&transparent=true&version=1.1.1&width=256&height=256&srs=EPSG:3857&bbox={bbox-epsg-3857}'
             },
             {
                 name:'Terrestrial Biodiversity',
                 id:'terrestrial-biodiversity',
-                layerName:3, isVisible:true,opacity:0.5,
+                layerName:10, isVisible:true,opacity:0.5,
                 bounds:[[-37.504648369999984, 141.00218093600006],[-28.165625517999956, 153.55163724800002]],
                 tile:'https://mapprod3.environment.nsw.gov.au/arcgis/services/Planning/Protection/MapServer/WmsServer?service=WMS&request=GetMap&layers=10&styles=default&format=image%2Fpng&transparent=true&version=1.1.1&width=256&height=256&srs=EPSG:3857&bbox={bbox-epsg-3857}'
             },
             {
                 name:'Wetlands',
                 id:'wetlands',
-                layerName:2,isVisible:true,opacity:0.5,
+                layerName:11,isVisible:true,opacity:0.5,
                 bounds:[[-36.889320862999966, 141.00218102600002],[-28.713293111999974, 153.48181948]],
                 tile:'https://mapprod3.environment.nsw.gov.au/arcgis/services/Planning/Protection/MapServer/WmsServer?service=WMS&request=GetMap&layers=11&styles=default&format=image%2Fpng&transparent=true&version=1.1.1&width=256&height=256&srs=EPSG:3857&bbox={bbox-epsg-3857}'
             },
             {
                 name:'Environmentally Sensitive Land',
                 id:'environmentally-sensitive-land',
-                layerName:1,isVisible:true,opacity:0.01,
+                layerName:12,isVisible:true,opacity:0.01,
                 bounds:[[-35.1588681209999, 147.31264960400006],[-32.17104704099995, 151.646695431]],
                 tile:'https://mapprod3.environment.nsw.gov.au/arcgis/services/Planning/Protection/MapServer/WmsServer?service=WMS&request=GetMap&layers=12&styles=default&format=image%2Fpng&transparent=true&version=1.1.1&width=256&height=256&srs=EPSG:3857&bbox={bbox-epsg-3857}'
             },
@@ -399,66 +415,68 @@ let mapLayers = {
     },
     'SEPP Biodiversity & Conservation':{
         id:'sepp-bio',
-        source:'https://mapprod3.environment.nsw.gov.au/arcgis/services/Planning/SEPP_Biodiversity_and_Conservation_2021/MapServer/WMSServer',
+        source:'https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/SEPP_Biodiversity_and_Conservation_2021/MapServer/export',
+        isProperty:true,
+        // source:'https://mapprod3.environment.nsw.gov.au/arcgis/services/Planning/SEPP_Biodiversity_and_Conservation_2021/MapServer/WMSServer',
         layers:[
             {
                 "name":"Subject Land",
                 "id":"subject-land-area",
-                "layerName":"15", isVisible:true,opacity:0.01,
+                "layerName":"1", isVisible:true,opacity:0.01,
             },
             {
                 "name":"Land Application",
                 "id":"land-application-area",
-                "layerName":"14", isVisible:true,opacity:0.01,
+                "layerName":"2", isVisible:true,opacity:0.01,
             },
             {
                 "name":"Foreshores and Waterways Area",
                 "id":"foreshores-and-waterways-area",
-                "layerName":"13", isVisible:true,opacity:0.01,
+                "layerName":"3", isVisible:true,opacity:0.01,
             },
             {
                 "name":"Hawkesbury-Nepean Riverine Scenic Area",
                 "id":"hawkesbury-nepean-riverine-scenic-area",
-                "layerName":"9",isVisible:true,opacity:0.01,
+                "layerName":"7",isVisible:true,opacity:0.01,
             },
             {
                 "name":"Strategic Harbour Foreshore Sites",
                 "id":"strategic-harbour-foreshore-sites",
-                "layerName":"7",isVisible:true,opacity:0.01,
+                "layerName":"9",isVisible:true,opacity:0.01,
             },
             {
                 "name":"Strategic Conservation Area",
                 "id":"strategic-conservation-area",
-                "layerName":"3",isVisible:true,opacity:0.01,
+                "layerName":"13",isVisible:true,opacity:0.01,
             },
             {
                 "name":"Certified - Urban Capable Land",
                 "id":"certified-urban-capable-land",
-                "layerName":"2",isVisible:true,opacity:0.01,
+                "layerName":"14",isVisible:true,opacity:0.01,
             },
             {
                 "name":"Avoided Land",
                 "id":"avoided-land",
-                "layerName":"1",isVisible:true,opacity:0.01,
+                "layerName":"15",isVisible:true,opacity:0.01,
             },
             {
                 "name":"Foreshores and Waterways Area - Zone",
                 "id":"foreshores-and-waterways-area-zone",
-                "layerName":"4", isVisible:true,opacity:0.01,
+                "layerName":"12", isVisible:true,opacity:0.01,
                 "bounds":[[-37.528014,140.999261],[-28.141279,159.340295]],
                 "tile":"https://mapprod3.environment.nsw.gov.au/arcgis/services/Planning/SEPP_Biodiversity_and_Conservation_2021/MapServer/WmsServer?service=WMS&request=GetMap&layers=12&styles=default&format=image%2Fpng&transparent=true&version=1.1.1&width=256&height=256&srs=EPSG:3857&bbox={bbox-epsg-3857}"
             },
             {
                 "name":"Hawkesbury-Nepean Catchment",
                 "id":"hawkesbury-nepean-river-riverine",
-                "layerName":"12",isVisible:true,opacity:0.01,
+                "layerName":"4",isVisible:true,opacity:0.01,
                 "bounds":[[-37.528014,140.999261],[-28.141279,159.340295]],
                 "tile":"https://mapprod3.environment.nsw.gov.au/arcgis/services/Planning/SEPP_Biodiversity_and_Conservation_2021/MapServer/WmsServer?service=WMS&request=GetMap&layers=11&styles=default&format=image%2Fpng&transparent=true&version=1.1.1&width=256&height=256&srs=EPSG:3857&bbox={bbox-epsg-3857}"
             },
             {
                 "name":"Sydney Harbour Catchment",
                 "id":"sydney-harbour-catchment",
-                "layerName":"6",isVisible:true,opacity:0.01,
+                "layerName":"10",isVisible:true,opacity:0.01,
                 "bounds":[[-37.528014,140.999261],[-28.141279,159.340295]],
                 "tile":""
             },

@@ -41,6 +41,28 @@ body {
     font-family: 'Poppins', sans-serif;
 }
 
+.custom-search-tab {
+    position: absolute;
+    display: none !important;
+    top:20px;
+    left:100px;
+    z-index: 4;
+    background-color: orange;
+    padding:5px;
+    box-shadow: 0px 0px 0.25rem #7f7d7d;
+    border-radius: 5px;
+}
+
+.custom-search-tab input {
+    font-size: 120%;
+    border: 0;
+    /* background-color: transparent; */
+    width: 100%;
+    line-height: 40px;
+    margin-left: 0px;
+    color: #000!important;
+}
+
 
 .toggler-header {
     cursor: pointer;
@@ -267,6 +289,16 @@ body {
 .mapboxgl-ctrl-geocoder--input {
     background-color: #222;
 }
+
+.dimension-layer {
+    width: 45px !important;
+}
+
+.dimension-layer > div {
+    width:100%;
+}
+
+
 
 .metric-marker {
     font-size: 1rem;

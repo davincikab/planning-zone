@@ -40,6 +40,7 @@ let LayerControl = function(layers, map) {
             transparent: true,
             crs:L.CRS.EPSG4326,
             attribution: "NSW",
+            maxZoom:20,
             // bounds:layer.bo[...layer.bounds],
             layerId:layer.id,
             opacity:layer.opacity,
@@ -58,15 +59,18 @@ let LayerControl = function(layers, map) {
 
     this.renderPropertyWms = (layer, source) => {
         let requestStyles = layer.layers ? layer.layers.map(lyr => 'default').join(",") : "default";
-
+        
+        // console.log(layer);
+        let layerName = `${layer.layerName}`;
         let tileWms = L.tileLayer.wms(source, {
-            layers: `show:${layer.layerName}`,
+            layers: `show:${layerName.split(",")}`,
             styles:requestStyles,
             format: 'png',
             transparent: true,
             crs:L.CRS.EPSG3857,
             bboxSR:3857,
             imageSR:3857,
+            maxZoom:20,
             attribution: "NSW",
             layerId:layer.id,
             f:'image',
@@ -194,7 +198,6 @@ let LayerControl = function(layers, map) {
     }
 
     this.updateLegendItems = (layer, imageUrl) => {
-        console.log(layer);
         let legendContent = `<div class="legend-item" id="${layer.wmsParams.layerId}-${layer.wmsParams.layers}">
             <div class="legend-text">${layer.wmsParams.name}</div>
             <img src="${imageUrl}" alt="">

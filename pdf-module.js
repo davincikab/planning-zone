@@ -117,7 +117,8 @@ let PdfModule = function(map) {
         }
 
 
-        this.locationMarker = L.marker(this.location).addTo(this.minimap);
+        this.locationMarker = L.marker(this.location);
+        // .addTo(this.minimap);
     }
 
     this.getLocationAddress = () => {
